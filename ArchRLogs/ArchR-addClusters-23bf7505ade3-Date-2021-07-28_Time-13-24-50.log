@@ -1,0 +1,210 @@
+
+           ___      .______        ______  __    __  .______      
+          /   \     |   _  \      /      ||  |  |  | |   _  \     
+         /  ^  \    |  |_)  |    |  ,----'|  |__|  | |  |_)  |    
+        /  /_\  \   |      /     |  |     |   __   | |      /     
+       /  _____  \  |  |\  \\___ |  `----.|  |  |  | |  |\  \\___.
+      /__/     \__\ | _| `._____| \______||__|  |__| | _| `._____|
+    
+Logging With ArchR!
+
+Start Time : 2021-07-28 13:24:50
+
+------- ArchR Info
+
+ArchRThreads = 4
+ArchRGenome = Hg38
+
+------- System Info
+
+Computer OS = unix
+Total Cores = 8
+
+------- Session Info
+
+R version 4.1.0 (2021-05-18)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Big Sur 11.2.3
+
+Matrix products: default
+LAPACK: /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+ [1] grid      parallel  stats4    stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] nabor_0.5.0                       SeuratObject_4.0.2                Seurat_4.0.3                     
+ [4] gridExtra_2.3                     Rsamtools_2.8.0                   BSgenome.Hsapiens.UCSC.hg38_1.4.3
+ [7] BSgenome_1.60.0                   rtracklayer_1.52.0                Biostrings_2.60.1                
+[10] XVector_0.32.0                    ArchR_1.0.1                       magrittr_2.0.1                   
+[13] rhdf5_2.36.0                      Matrix_1.3-4                      data.table_1.14.0                
+[16] SummarizedExperiment_1.22.0       Biobase_2.52.0                    MatrixGenerics_1.4.0             
+[19] matrixStats_0.60.0                ggplot2_3.3.5                     GenomicRanges_1.44.0             
+[22] GenomeInfoDb_1.28.1               IRanges_2.26.0                    S4Vectors_0.30.0                 
+[25] BiocGenerics_0.38.0              
+
+loaded via a namespace (and not attached):
+  [1] plyr_1.8.6               igraph_1.2.6             lazyeval_0.2.2           splines_4.1.0           
+  [5] BiocParallel_1.26.1      listenv_0.8.0            scattermore_0.7          digest_0.6.27           
+  [9] htmltools_0.5.1.1        fansi_0.5.0              tensor_1.5               cluster_2.1.2           
+ [13] ROCR_1.0-11              globals_0.14.0           spatstat.sparse_2.0-0    colorspace_2.0-2        
+ [17] ggrepel_0.9.1            xfun_0.24                dplyr_1.0.7              crayon_1.4.1            
+ [21] RCurl_1.98-1.3           jsonlite_1.7.2           spatstat.data_2.1-0      survival_3.2-11         
+ [25] zoo_1.8-9                glue_1.4.2               polyclip_1.10-0          gtable_0.3.0            
+ [29] zlibbioc_1.38.0          leiden_0.3.8             DelayedArray_0.18.0      Rhdf5lib_1.14.2         
+ [33] future.apply_1.7.0       abind_1.4-5              scales_1.1.1             pheatmap_1.0.12         
+ [37] miniUI_0.1.1.1           Rcpp_1.0.7               viridisLite_0.4.0        xtable_1.8-4            
+ [41] reticulate_1.20          spatstat.core_2.3-0      htmlwidgets_1.5.3        httr_1.4.2              
+ [45] RColorBrewer_1.1-2       ellipsis_0.3.2           ica_1.0-2                farver_2.1.0            
+ [49] pkgconfig_2.0.3          XML_3.99-0.6             uwot_0.1.10              deldir_0.2-10           
+ [53] utf8_1.2.2               labeling_0.4.2           tidyselect_1.1.1         rlang_0.4.11            
+ [57] reshape2_1.4.4           later_1.2.0              munsell_0.5.0            tools_4.1.0             
+ [61] cli_3.0.1                generics_0.1.0           ggridges_0.5.3           evaluate_0.14           
+ [65] stringr_1.4.0            fastmap_1.1.0            yaml_2.2.1               goftest_1.2-2           
+ [69] knitr_1.33               fitdistrplus_1.1-5       purrr_0.3.4              RANN_2.6.1              
+ [73] pbapply_1.4-3            future_1.21.0            nlme_3.1-152             mime_0.11               
+ [77] compiler_4.1.0           rstudioapi_0.13          plotly_4.9.4.1           png_0.1-7               
+ [81] spatstat.utils_2.2-0     tibble_3.1.3             stringi_1.7.3            RSpectra_0.16-0         
+ [85] lattice_0.20-44          vctrs_0.3.8              pillar_1.6.1             lifecycle_1.0.0         
+ [89] rhdf5filters_1.4.0       spatstat.geom_2.2-2      lmtest_0.9-38            RcppAnnoy_0.0.18        
+ [93] cowplot_1.1.1            bitops_1.0-7             irlba_2.3.3              httpuv_1.6.1            
+ [97] patchwork_1.1.1          R6_2.5.0                 BiocIO_1.2.0             promises_1.2.0.1        
+[101] KernSmooth_2.23-20       parallelly_1.27.0        codetools_0.2-18         gtools_3.9.2            
+[105] MASS_7.3-54              rjson_0.2.20             withr_2.4.2              GenomicAlignments_1.28.0
+[109] sctransform_0.3.2        GenomeInfoDbData_1.2.6   mgcv_1.8-36              rpart_4.1-15            
+[113] tidyr_1.1.3              rmarkdown_2.9            Cairo_1.5-12.2           Rtsne_0.15              
+[117] shiny_1.6.0              restfulr_0.0.13         
+
+
+------- Log Info
+
+
+2021-07-28 13:24:50 : addClusters Input-Parameters, Class = list
+
+addClusters Input-Parameters$: length = 1
+                       
+1 function (name)      
+2 .Internal(args(name))
+
+
+addClusters Input-Parameters$input: length = 1
+
+addClusters Input-Parameters$reducedDims: length = 1
+[1] "LSI_RNA"
+
+
+addClusters Input-Parameters$name: length = 1
+[1] "Clusters_RNA"
+
+
+addClusters Input-Parameters$sampleCells: length = 0
+NULL
+
+
+addClusters Input-Parameters$seed: length = 1
+[1] 1
+
+
+addClusters Input-Parameters$method: length = 1
+[1] "Seurat"
+
+
+addClusters Input-Parameters$dimsToUse: length = 0
+NULL
+
+
+addClusters Input-Parameters$scaleDims: length = 0
+NULL
+
+
+addClusters Input-Parameters$corCutOff: length = 1
+[1] 0.75
+
+
+addClusters Input-Parameters$knnAssign: length = 1
+[1] 10
+
+
+addClusters Input-Parameters$nOutlier: length = 1
+[1] 5
+
+
+addClusters Input-Parameters$maxClusters: length = 1
+[1] 25
+
+
+addClusters Input-Parameters$testBias: length = 1
+[1] TRUE
+
+
+addClusters Input-Parameters$filterBias: length = 1
+[1] FALSE
+
+
+addClusters Input-Parameters$biasClusters: length = 1
+[1] 0.01
+
+
+addClusters Input-Parameters$biasCol: length = 1
+[1] "nFrags"
+
+
+addClusters Input-Parameters$biasVals: length = 0
+NULL
+
+
+addClusters Input-Parameters$biasQuantiles: length = 2
+[1] 0.05 0.95
+
+
+addClusters Input-Parameters$biasEnrich: length = 1
+[1] 10
+
+
+addClusters Input-Parameters$biasProportion: length = 1
+[1] 0.5
+
+
+addClusters Input-Parameters$biasPval: length = 1
+[1] 0.05
+
+
+addClusters Input-Parameters$nPerm: length = 1
+[1] 500
+
+
+addClusters Input-Parameters$prefix: length = 1
+[1] "C"
+
+
+addClusters Input-Parameters$ArchRProj: length = 0
+NULL
+
+
+addClusters Input-Parameters$verbose: length = 1
+[1] TRUE
+
+
+addClusters Input-Parameters$tstart: length = 0
+NULL
+
+
+addClusters Input-Parameters$force: length = 1
+[1] TRUE
+
+
+addClusters Input-Parameters$logFile: length = 1
+[1] "ArchRLogs/ArchR-addClusters-23bf7505ade3-Date-2021-07-28_Time-13-24-50.log"
+
+
+addClusters Input-Parameters$...: length = 1
+
+2021-07-28 13:24:50 : Running Seurats FindClusters (Stuart et al. Cell 2019), 0.001 mins elapsed.
+2021-07-28 13:25:06 : Testing Biased Clusters, 0.265 mins elapsed.
+2021-07-28 13:25:06 : Identified Biased Clusters (n = 2), set filterBias = TRUE to re-assign these cells: , 0.266 mins elapsed.
+2021-07-28 13:25:06 : Testing Outlier Clusters, 0.267 mins elapsed.
+2021-07-28 13:25:06 : Assigning Cluster Names to 17 Clusters, 0.267 mins elapsed.
+2021-07-28 13:25:06 : Finished addClusters, 0.268 mins elapsed.

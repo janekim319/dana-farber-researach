@@ -1,0 +1,986 @@
+
+           ___      .______        ______  __    __  .______      
+          /   \     |   _  \      /      ||  |  |  | |   _  \     
+         /  ^  \    |  |_)  |    |  ,----'|  |__|  | |  |_)  |    
+        /  /_\  \   |      /     |  |     |   __   | |      /     
+       /  _____  \  |  |\  \\___ |  `----.|  |  |  | |  |\  \\___.
+      /__/     \__\ | _| `._____| \______||__|  |__| | _| `._____|
+    
+Logging With ArchR!
+
+Start Time : 2021-07-28 12:58:32
+
+------- ArchR Info
+
+ArchRThreads = 4
+ArchRGenome = Hg38
+
+------- System Info
+
+Computer OS = unix
+Total Cores = 8
+
+------- Session Info
+
+R version 4.1.0 (2021-05-18)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Big Sur 11.2.3
+
+Matrix products: default
+LAPACK: /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+ [1] grid      parallel  stats4    stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] gridExtra_2.3                     Rsamtools_2.8.0                   BSgenome.Hsapiens.UCSC.hg38_1.4.3
+ [4] BSgenome_1.60.0                   rtracklayer_1.52.0                Biostrings_2.60.1                
+ [7] XVector_0.32.0                    ArchR_1.0.1                       magrittr_2.0.1                   
+[10] rhdf5_2.36.0                      Matrix_1.3-4                      data.table_1.14.0                
+[13] SummarizedExperiment_1.22.0       Biobase_2.52.0                    MatrixGenerics_1.4.0             
+[16] matrixStats_0.60.0                ggplot2_3.3.5                     GenomicRanges_1.44.0             
+[19] GenomeInfoDb_1.28.1               IRanges_2.26.0                    S4Vectors_0.30.0                 
+[22] BiocGenerics_0.38.0              
+
+loaded via a namespace (and not attached):
+  [1] plyr_1.8.6               igraph_1.2.6             lazyeval_0.2.2           splines_4.1.0           
+  [5] BiocParallel_1.26.1      listenv_0.8.0            scattermore_0.7          digest_0.6.27           
+  [9] htmltools_0.5.1.1        fansi_0.5.0              tensor_1.5               cluster_2.1.2           
+ [13] ROCR_1.0-11              globals_0.14.0           spatstat.sparse_2.0-0    colorspace_2.0-2        
+ [17] ggrepel_0.9.1            xfun_0.24                dplyr_1.0.7              crayon_1.4.1            
+ [21] RCurl_1.98-1.3           jsonlite_1.7.2           spatstat.data_2.1-0      survival_3.2-11         
+ [25] zoo_1.8-9                glue_1.4.2               polyclip_1.10-0          gtable_0.3.0            
+ [29] zlibbioc_1.38.0          leiden_0.3.8             DelayedArray_0.18.0      Rhdf5lib_1.14.2         
+ [33] future.apply_1.7.0       abind_1.4-5              scales_1.1.1             pheatmap_1.0.12         
+ [37] miniUI_0.1.1.1           Rcpp_1.0.7               viridisLite_0.4.0        xtable_1.8-4            
+ [41] reticulate_1.20          spatstat.core_2.3-0      htmlwidgets_1.5.3        httr_1.4.2              
+ [45] RColorBrewer_1.1-2       ellipsis_0.3.2           Seurat_4.0.3             ica_1.0-2               
+ [49] farver_2.1.0             pkgconfig_2.0.3          XML_3.99-0.6             uwot_0.1.10             
+ [53] deldir_0.2-10            utf8_1.2.2               labeling_0.4.2           tidyselect_1.1.1        
+ [57] rlang_0.4.11             reshape2_1.4.4           later_1.2.0              munsell_0.5.0           
+ [61] tools_4.1.0              cli_3.0.1                generics_0.1.0           ggridges_0.5.3          
+ [65] evaluate_0.14            stringr_1.4.0            fastmap_1.1.0            yaml_2.2.1              
+ [69] goftest_1.2-2            knitr_1.33               fitdistrplus_1.1-5       purrr_0.3.4             
+ [73] RANN_2.6.1               pbapply_1.4-3            future_1.21.0            nlme_3.1-152            
+ [77] mime_0.11                compiler_4.1.0           rstudioapi_0.13          plotly_4.9.4.1          
+ [81] png_0.1-7                spatstat.utils_2.2-0     tibble_3.1.3             stringi_1.7.3           
+ [85] lattice_0.20-44          vctrs_0.3.8              pillar_1.6.1             lifecycle_1.0.0         
+ [89] rhdf5filters_1.4.0       spatstat.geom_2.2-2      lmtest_0.9-38            RcppAnnoy_0.0.18        
+ [93] cowplot_1.1.1            bitops_1.0-7             irlba_2.3.3              httpuv_1.6.1            
+ [97] patchwork_1.1.1          R6_2.5.0                 BiocIO_1.2.0             promises_1.2.0.1        
+[101] KernSmooth_2.23-20       parallelly_1.27.0        codetools_0.2-18         MASS_7.3-54             
+[105] rjson_0.2.20             withr_2.4.2              SeuratObject_4.0.2       GenomicAlignments_1.28.0
+[109] sctransform_0.3.2        GenomeInfoDbData_1.2.6   mgcv_1.8-36              rpart_4.1-15            
+[113] tidyr_1.1.3              rmarkdown_2.9            Cairo_1.5-12.2           Rtsne_0.15              
+[117] shiny_1.6.0              restfulr_0.0.13         
+
+
+------- Log Info
+
+
+2021-07-28 12:58:32 : IterativeLSI Input-Parameters, Class = list
+
+IterativeLSI Input-Parameters$ArchRProj: length = 1
+
+IterativeLSI Input-Parameters$useMatrix: length = 1
+[1] "TileMatrix"
+
+
+IterativeLSI Input-Parameters$name: length = 1
+[1] "LSI_ATAC"
+
+
+IterativeLSI Input-Parameters$iterations: length = 1
+[1] 2
+
+
+IterativeLSI Input-Parameters$firstSelection: length = 1
+[1] "top"
+
+
+IterativeLSI Input-Parameters$depthCol: length = 1
+[1] "nFrags"
+
+
+IterativeLSI Input-Parameters$varFeatures: length = 1
+[1] 25000
+
+
+IterativeLSI Input-Parameters$dimsToUse: length = 30
+[1] 1 2 3 4 5 6
+
+
+IterativeLSI Input-Parameters$LSIMethod: length = 1
+[1] 2
+
+
+IterativeLSI Input-Parameters$scaleDims: length = 1
+[1] TRUE
+
+
+IterativeLSI Input-Parameters$corCutOff: length = 1
+[1] 0.75
+
+
+IterativeLSI Input-Parameters$binarize: length = 1
+[1] TRUE
+
+
+IterativeLSI Input-Parameters$outlierQuantiles: length = 2
+[1] 0.02 0.98
+
+
+IterativeLSI Input-Parameters$filterBias: length = 1
+[1] TRUE
+
+
+IterativeLSI Input-Parameters$sampleCellsPre: length = 1
+[1] 10000
+
+
+IterativeLSI Input-Parameters$projectCellsPre: length = 1
+[1] FALSE
+
+
+IterativeLSI Input-Parameters$sampleCellsFinal: length = 0
+NULL
+
+
+IterativeLSI Input-Parameters$selectionMethod: length = 1
+[1] "var"
+
+
+IterativeLSI Input-Parameters$scaleTo: length = 1
+[1] 10000
+
+
+IterativeLSI Input-Parameters$totalFeatures: length = 1
+[1] 5e+05
+
+
+IterativeLSI Input-Parameters$filterQuantile: length = 1
+[1] 0.995
+
+
+IterativeLSI Input-Parameters$excludeChr: length = 0
+NULL
+
+
+IterativeLSI Input-Parameters$saveIterations: length = 1
+[1] FALSE
+
+
+IterativeLSI Input-Parameters$nPlot: length = 1
+[1] 10000
+
+
+IterativeLSI Input-Parameters$outDir: length = 1
+[1] "/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/benchmark"
+
+
+IterativeLSI Input-Parameters$threads: length = 1
+[1] 4
+
+
+IterativeLSI Input-Parameters$seed: length = 1
+[1] 1
+
+
+IterativeLSI Input-Parameters$verbose: length = 1
+[1] TRUE
+
+
+IterativeLSI Input-Parameters$force: length = 1
+[1] FALSE
+
+
+IterativeLSI Input-Parameters$logFile: length = 1
+[1] "ArchRLogs/ArchR-addIterativeLSI-23bf694a5088-Date-2021-07-28_Time-12-58-32.log"
+
+
+2021-07-28 12:58:33 : Computing Total Across All Features, 0.003 mins elapsed.
+2021-07-28 12:58:34 : Computing Top Features, 0.027 mins elapsed.
+###########
+2021-07-28 12:58:36 : Running LSI (1 of 2) on Top Features, 0.067 mins elapsed.
+###########
+2021-07-28 12:58:36 : Sampling Cells (N = 10000) for Estimated LSI, 0.067 mins elapsed.
+2021-07-28 12:58:36 : Creating Sampled Partial Matrix, 0.068 mins elapsed.
+2021-07-28 12:59:08 : Computing Estimated LSI (projectAll = FALSE), 0.6 mins elapsed.
+
+2021-07-28 12:59:08 : LSI Parameters, Class = list
+
+LSI Parameters$: length = 1
+                       
+1 function (name)      
+2 .Internal(args(name))
+
+
+LSI Parameters$mat: nRows = 25000, nCols = 10000
+LSI Parameters$mat: NonZeroEntries = 48301116, EntryRange = [ 1 , 1 ]
+5 x 5 sparse Matrix of class "dgCMatrix"
+     PBMC_10k#AAACAGCCAAGGAATC-1 PBMC_10k#AAACAGCCAATCCCTT-1 PBMC_10k#AAACAGCCAATGCGCT-1 PBMC_10k#AAACAGCCACCAACCG-1
+[1,]                           .                           .                           .                           .
+[2,]                           .                           1                           .                           .
+[3,]                           1                           .                           .                           .
+[4,]                           .                           .                           .                           1
+[5,]                           1                           .                           .                           1
+     PBMC_10k#AAACAGCCAGTAGGTG-1
+[1,]                           1
+[2,]                           1
+[3,]                           1
+[4,]                           1
+[5,]                           1
+
+
+LSI Parameters$LSIMethod: length = 1
+[1] 2
+
+
+LSI Parameters$scaleTo: length = 1
+[1] 10000
+
+
+LSI Parameters$nDimensions: length = 1
+[1] 30
+
+
+LSI Parameters$binarize: length = 1
+[1] TRUE
+
+
+LSI Parameters$outlierQuantiles: length = 2
+[1] 0.02 0.98
+
+
+LSI Parameters$seed: length = 1
+[1] 1
+
+
+LSI Parameters$verbose: length = 1
+[1] FALSE
+
+
+LSI Parameters$tstart: length = 1
+[1] "2021-07-28 12:58:32 EDT"
+
+
+LSI Parameters$logFile: length = 1
+[1] "ArchRLogs/ArchR-addIterativeLSI-23bf694a5088-Date-2021-07-28_Time-12-58-32.log"
+
+
+2021-07-28 12:59:09 : Running LSI, Input Matrix = 0.581 GB, 0.609 mins elapsed.
+2021-07-28 12:59:09 : Binarizing Matrix, 0.609 mins elapsed.
+2021-07-28 12:59:09 : Computing Term Frequency, 0.615 mins elapsed.
+2021-07-28 12:59:09 : Filtering Outliers Based On Counts, 0.617 mins elapsed.
+2021-07-28 12:59:10 : Removing 0 Sum Rows, 0.63 mins elapsed.
+2021-07-28 12:59:12 : Computing Inverse Document Frequency, 0.662 mins elapsed.
+2021-07-28 12:59:13 : Computing SVD using irlba, 0.684 mins elapsed.
+2021-07-28 12:59:47 : Projecting Outliers with LSI-Projection (Granja* et al 2019), 1.237 mins elapsed.
+
+2021-07-28 12:59:47 : LSI-Projection Parameters, Class = list
+
+LSI-Projection Parameters$: length = 1
+                       
+1 function (name)      
+2 .Internal(args(name))
+
+
+LSI-Projection Parameters$mat: nRows = 25000, nCols = 10
+LSI-Projection Parameters$mat: NonZeroEntries = 48770, EntryRange = [ 1 , 1 ]
+5 x 5 sparse Matrix of class "dgCMatrix"
+     PBMC_10k#AAACAGCCAATCCCTT-1 PBMC_10k#AAACAGCCAATGCGCT-1 PBMC_10k#AAACAGCCACCAACCG-1 PBMC_10k#AAACAGCCAGTAGGTG-1
+[1,]                           .                           .                           .                           1
+[2,]                           1                           .                           .                           1
+[3,]                           .                           .                           .                           1
+[4,]                           .                           .                           1                           1
+[5,]                           .                           .                           1                           1
+     PBMC_10k#AAACAGCCAGTTTACG-1
+[1,]                           .
+[2,]                           .
+[3,]                           .
+[4,]                           .
+[5,]                           1
+
+
+LSI-Projection Parameters$matSVD: nRows = 9600, nCols = 30
+                                  LSI1      LSI2      LSI3       LSI4       LSI5
+PBMC_10k#AAACAGCCAATCCCTT-1  -80.22151 -13.88951  2.845368 -4.1185553  -5.255961
+PBMC_10k#AAACAGCCAATGCGCT-1  -68.01339 -13.71343 -5.931370  2.6125060   2.860558
+PBMC_10k#AAACAGCCACCAACCG-1  -43.03785 -10.10167 -3.067047  0.1563207   2.635904
+PBMC_10k#AAACAGCCAGTAGGTG-1 -107.97079 -22.67962 -3.101336  1.8942050   2.248176
+PBMC_10k#AAACAGCCAGTTTACG-1  -79.67770 -13.17610 -3.066464 -1.0716253 -11.096655
+
+
+LSI-Projection Parameters$returnModel: length = 1
+[1] FALSE
+
+
+LSI-Projection Parameters$verbose: length = 1
+[1] FALSE
+
+
+LSI-Projection Parameters$tstart: length = 0
+NULL
+
+
+LSI-Projection Parameters$logFile: length = 1
+[1] "ArchRLogs/ArchR-addIterativeLSI-23bf694a5088-Date-2021-07-28_Time-12-58-32.log"
+
+
+2021-07-28 12:59:47 : Projecting LSI, Input Matrix = 0.001 GB, 0 mins elapsed.
+2021-07-28 12:59:47 : Subsetting by Non-Zero features in inital Matrix, 0 mins elapsed.
+2021-07-28 12:59:47 : Binarizing Matrix, 0 mins elapsed.
+2021-07-28 12:59:47 : Computing Term Frequency, 0 mins elapsed.
+2021-07-28 12:59:47 : Computing Inverse Document Frequency, 0 mins elapsed.
+2021-07-28 12:59:47 : Computing TF-IDF Matrix, 0 mins elapsed.
+2021-07-28 12:59:47 : Calculating V Matrix, 0.008 mins elapsed.
+2021-07-28 12:59:47 : Computing Projected Coordinates, 0.008 mins elapsed.
+
+2021-07-28 12:59:47 : LSI-Projection Parameters, Class = list
+
+LSI-Projection Parameters$: length = 1
+                       
+1 function (name)      
+2 .Internal(args(name))
+
+
+LSI-Projection Parameters$mat: nRows = 25000, nCols = 400
+LSI-Projection Parameters$mat: NonZeroEntries = 2369884, EntryRange = [ 1 , 1 ]
+5 x 5 sparse Matrix of class "dgCMatrix"
+     PBMC_10k#AAACAGCCAAGGAATC-1 PBMC_10k#AAACCAACACTAAGAA-1 PBMC_10k#AAAGCAAGTGTAATAC-1 PBMC_10k#AAAGCAAGTTAACGGC-1
+[1,]                           .                           1                           .                           .
+[2,]                           .                           1                           .                           .
+[3,]                           1                           1                           .                           .
+[4,]                           .                           .                           .                           .
+[5,]                           1                           .                           .                           .
+     PBMC_10k#AAAGCCGCATTAAGCT-1
+[1,]                           .
+[2,]                           .
+[3,]                           .
+[4,]                           .
+[5,]                           .
+
+
+LSI-Projection Parameters$matSVD: nRows = 9600, nCols = 30
+                                  LSI1      LSI2      LSI3       LSI4       LSI5
+PBMC_10k#AAACAGCCAATCCCTT-1  -80.22151 -13.88951  2.845368 -4.1185553  -5.255961
+PBMC_10k#AAACAGCCAATGCGCT-1  -68.01339 -13.71343 -5.931370  2.6125060   2.860558
+PBMC_10k#AAACAGCCACCAACCG-1  -43.03785 -10.10167 -3.067047  0.1563207   2.635904
+PBMC_10k#AAACAGCCAGTAGGTG-1 -107.97079 -22.67962 -3.101336  1.8942050   2.248176
+PBMC_10k#AAACAGCCAGTTTACG-1  -79.67770 -13.17610 -3.066464 -1.0716253 -11.096655
+
+
+LSI-Projection Parameters$returnModel: length = 1
+[1] FALSE
+
+
+LSI-Projection Parameters$verbose: length = 1
+[1] FALSE
+
+
+LSI-Projection Parameters$tstart: length = 0
+NULL
+
+
+LSI-Projection Parameters$logFile: length = 1
+[1] "ArchRLogs/ArchR-addIterativeLSI-23bf694a5088-Date-2021-07-28_Time-12-58-32.log"
+
+
+2021-07-28 12:59:47 : Projecting LSI, Input Matrix = 0.028 GB, 0 mins elapsed.
+2021-07-28 12:59:47 : Subsetting by Non-Zero features in inital Matrix, 0 mins elapsed.
+2021-07-28 12:59:47 : Binarizing Matrix, 0.001 mins elapsed.
+2021-07-28 12:59:47 : Computing Term Frequency, 0.001 mins elapsed.
+2021-07-28 12:59:47 : Computing Inverse Document Frequency, 0.002 mins elapsed.
+2021-07-28 12:59:47 : Computing TF-IDF Matrix, 0.002 mins elapsed.
+2021-07-28 12:59:48 : Calculating V Matrix, 0.01 mins elapsed.
+2021-07-28 12:59:48 : Computing Projected Coordinates, 0.01 mins elapsed.
+2021-07-28 12:59:48 : Finished LSI (TF-IDF SVD) using irlba, 1.257 mins elapsed.
+
+2021-07-28 12:59:49 : outLSI-1, Class = SimpleList
+
+outLSI-1$matSVD: nRows = 10000, nCols = 30
+                                  LSI1      LSI2      LSI3       LSI4      LSI5
+PBMC_10k#AAACAGCCAAGGAATC-1 -122.55625 -25.90962 -9.813168  5.0033528  5.658874
+PBMC_10k#AAACAGCCAATCCCTT-1  -80.22151 -13.88951  2.845368 -4.1185553 -5.255961
+PBMC_10k#AAACAGCCAATGCGCT-1  -68.01339 -13.71343 -5.931370  2.6125060  2.860558
+PBMC_10k#AAACAGCCACCAACCG-1  -43.03785 -10.10167 -3.067047  0.1563207  2.635904
+PBMC_10k#AAACAGCCAGTAGGTG-1 -107.97079 -22.67962 -3.101336  1.8942050  2.248176
+
+
+outLSI-1$rowSm: length = 25000
+[1] 1401 1606 1173 1417 2473 1310
+
+
+outLSI-1$nCol: length = 1
+[1] 9600
+
+
+outLSI-1$exclude: length = 0
+NULL
+
+
+outLSI-1$idx: length = 25000
+[1] 1 2 3 4 5 6
+
+
+outLSI-1$u: nRows = 25000, nCols = 30
+             [,1]         [,2]          [,3]          [,4]          [,5]
+[1,] -0.005299990  0.002554861  0.0073362958 -0.0056122652  0.0016485461
+[2,] -0.005799981  0.001732151  0.0042287471 -0.0045505302  0.0005805787
+[3,] -0.004772264 -0.003801901 -0.0009647875  0.0082120333 -0.0035440431
+[4,] -0.005374915 -0.003228693 -0.0031141891  0.0007022051  0.0016044024
+[5,] -0.007559967 -0.002524445 -0.0008556932 -0.0027003585  0.0028792283
+
+
+outLSI-1$v: nRows = 9600, nCols = 30
+             [,1]         [,2]         [,3]          [,4]         [,5]
+[1,] -0.010864177 -0.007262469  0.003921952 -0.0059892183 -0.012095429
+[2,] -0.009210865 -0.007170397 -0.008175585  0.0037991158  0.006582941
+[3,] -0.005828497 -0.005281904 -0.004227507  0.0002273221  0.006065948
+[4,] -0.014622184 -0.011858591 -0.004274769  0.0027545599  0.005173678
+[5,] -0.010790530 -0.006889444 -0.004226703 -0.0015583615 -0.025536490
+
+
+outLSI-1$binarize: length = 1
+[1] TRUE
+
+
+outLSI-1$scaleTo: length = 1
+[1] 10000
+
+
+outLSI-1$nDimensions: length = 1
+[1] 30
+
+
+outLSI-1$LSIMethod: length = 1
+[1] 2
+
+
+outLSI-1$outliers: length = 400
+[1] "PBMC_10k#AAACAGCCAAGGAATC-1" "PBMC_10k#AAACCAACACTAAGAA-1" "PBMC_10k#AAAGCAAGTGTAATAC-1" "PBMC_10k#AAAGCAAGTTAACGGC-1"
+[5] "PBMC_10k#AAAGCCGCATTAAGCT-1" "PBMC_10k#AAAGGTTAGGTTACGT-1"
+
+
+outLSI-1$date: length = 1
+[1] "2021-07-28"
+
+
+outLSI-1$seed: length = 1
+[1] 1
+
+
+outLSI-1$scaleDims: length = 1
+[1] TRUE
+
+
+outLSI-1$useMatrix: length = 1
+[1] "TileMatrix"
+
+
+outLSI-1$tileSize: length = 1
+[1] 500
+
+
+
+2021-07-28 12:59:49 : Cluster Params, Class = list
+
+Cluster Params$: length = 1
+                       
+1 function (name)      
+2 .Internal(args(name))
+
+
+Cluster Params$matSVD: nRows = 10000, nCols = 30
+                                  LSI1      LSI2      LSI3       LSI4      LSI5
+PBMC_10k#AAACAGCCAAGGAATC-1 -122.55625 -25.90962 -9.813168  5.0033528  5.658874
+PBMC_10k#AAACAGCCAATCCCTT-1  -80.22151 -13.88951  2.845368 -4.1185553 -5.255961
+PBMC_10k#AAACAGCCAATGCGCT-1  -68.01339 -13.71343 -5.931370  2.6125060  2.860558
+PBMC_10k#AAACAGCCACCAACCG-1  -43.03785 -10.10167 -3.067047  0.1563207  2.635904
+PBMC_10k#AAACAGCCAGTAGGTG-1 -107.97079 -22.67962 -3.101336  1.8942050  2.248176
+
+
+Cluster Params$corCutOff: length = 1
+[1] 0.75
+
+
+Cluster Params$dimsToUse: length = 30
+[1] 1 2 3 4 5 6
+
+
+Cluster Params$scaleDims: length = 1
+[1] TRUE
+
+
+Cluster Params$verbose: length = 1
+[1] TRUE
+
+
+Cluster Params$j: length = 1
+[1] 1
+
+
+Cluster Params$filterBias: length = 1
+[1] TRUE
+
+
+Cluster Params$cellNames: length = 10387
+[1] "PBMC_10k#TAGCTAGGTTTGGGTA-1" "PBMC_10k#TTGGAGGCAGGCTTCG-1" "PBMC_10k#CATAGACTCCCTGGAA-1" "PBMC_10k#GGTGAGTAGGCGTAAA-1"
+[5] "PBMC_10k#ATTTGCAAGCCGCAAC-1" "PBMC_10k#TATAGGTGTCATCAAG-1"
+
+
+Cluster Params$cellDepth: length = 10387
+PBMC_10k#TAGCTAGGTTTGGGTA-1 PBMC_10k#TTGGAGGCAGGCTTCG-1 PBMC_10k#CATAGACTCCCTGGAA-1 PBMC_10k#GGTGAGTAGGCGTAAA-1 
+                   4.941149                    4.940940                    4.911387                    4.907879 
+PBMC_10k#ATTTGCAAGCCGCAAC-1 PBMC_10k#TATAGGTGTCATCAAG-1 
+                   4.898369                    4.898237 
+
+
+Cluster Params$tstart: length = 1
+[1] "2021-07-28 12:58:32 EDT"
+
+
+Cluster Params$logFile: length = 1
+[1] "ArchRLogs/ArchR-addIterativeLSI-23bf694a5088-Date-2021-07-28_Time-12-58-32.log"
+
+
+2021-07-28 12:59:49 : Identifying Clusters, 1.282 mins elapsed.
+
+2021-07-28 12:59:49 : addClusters Input-Parameters, Class = list
+
+addClusters Input-Parameters$: length = 1
+                       
+1 function (name)      
+2 .Internal(args(name))
+
+
+addClusters Input-Parameters$input: nRows = 10000, nCols = 30
+                                 LSI1       LSI2        LSI3        LSI4       LSI5
+PBMC_10k#AAACAGCCAAGGAATC-1 -5.137558 -0.9204172 -0.21805415  0.42845940  0.4570628
+PBMC_10k#AAACAGCCAATCCCTT-1 -5.120224 -0.7147006  0.39676779 -0.06574999 -0.1412922
+PBMC_10k#AAACAGCCAATGCGCT-1 -5.063559 -0.8659310 -0.26434347  0.39613599  0.4153115
+PBMC_10k#AAACAGCCACCAACCG-1 -4.979959 -0.9880672 -0.13546497  0.25520981  0.5557373
+PBMC_10k#AAACAGCCAGTAGGTG-1 -5.137160 -0.9431604  0.01955756  0.26520195  0.2826077
+
+
+addClusters Input-Parameters$reducedDims: length = 1
+[1] "IterativeLSI"
+
+
+addClusters Input-Parameters$name: length = 1
+[1] "Clusters"
+
+
+addClusters Input-Parameters$sampleCells: length = 1
+[1] 10000
+
+
+addClusters Input-Parameters$seed: length = 1
+[1] 1
+
+
+addClusters Input-Parameters$method: length = 1
+[1] "Seurat"
+
+
+addClusters Input-Parameters$dimsToUse: length = 0
+NULL
+
+
+addClusters Input-Parameters$scaleDims: length = 0
+NULL
+
+
+addClusters Input-Parameters$corCutOff: length = 1
+[1] 0.75
+
+
+addClusters Input-Parameters$knnAssign: length = 1
+[1] 10
+
+
+addClusters Input-Parameters$nOutlier: length = 1
+[1] 5
+
+
+addClusters Input-Parameters$maxClusters: length = 1
+[1] 25
+
+
+addClusters Input-Parameters$testBias: length = 1
+[1] TRUE
+
+
+addClusters Input-Parameters$filterBias: length = 1
+[1] TRUE
+
+
+addClusters Input-Parameters$biasClusters: length = 1
+[1] 0.01
+
+
+addClusters Input-Parameters$biasCol: length = 1
+[1] "nFrags"
+
+
+addClusters Input-Parameters$biasVals: length = 10000
+[1] 4.550607 4.127623 4.050612 3.710371 4.415824 4.109612
+
+
+addClusters Input-Parameters$biasQuantiles: length = 2
+[1] 0.05 0.95
+
+
+addClusters Input-Parameters$biasEnrich: length = 1
+[1] 10
+
+
+addClusters Input-Parameters$biasProportion: length = 1
+[1] 0.5
+
+
+addClusters Input-Parameters$biasPval: length = 1
+[1] 0.05
+
+
+addClusters Input-Parameters$nPerm: length = 1
+[1] 500
+
+
+addClusters Input-Parameters$prefix: length = 1
+[1] "C"
+
+
+addClusters Input-Parameters$ArchRProj: length = 0
+NULL
+
+
+addClusters Input-Parameters$verbose: length = 1
+[1] FALSE
+
+
+addClusters Input-Parameters$tstart: length = 0
+NULL
+
+
+addClusters Input-Parameters$force: length = 1
+[1] FALSE
+
+
+addClusters Input-Parameters$logFile: length = 1
+[1] "ArchRLogs/ArchR-addIterativeLSI-23bf694a5088-Date-2021-07-28_Time-12-58-32.log"
+
+
+addClusters Input-Parameters$...: length = 2
+
+2021-07-28 12:59:49 : Running Seurats FindClusters (Stuart et al. Cell 2019), 0 mins elapsed.
+2021-07-28 13:00:06 : Testing Biased Clusters, 0.276 mins elapsed.
+2021-07-28 13:00:06 : Assigning Biased Clusters (n = 1) to Neighbors, 0.278 mins elapsed.
+2021-07-28 13:00:06 : Testing Outlier Clusters, 0.284 mins elapsed.
+2021-07-28 13:00:06 : Assigning Cluster Names to 9 Clusters, 0.284 mins elapsed.
+2021-07-28 13:00:06 : Finished addClusters, 0.284 mins elapsed.
+2021-07-28 13:00:06 : Identified 9 Clusters, 1.567 mins elapsed.
+
+2021-07-28 13:00:06 : clusterDF-1, Class = DFrame
+DataFrame with 10000 rows and 2 columns
+                   cellNames    clusters
+                 <character> <character>
+1     PBMC_10k#AAACAGCCAAG..          C5
+2     PBMC_10k#AAACAGCCAAT..          C6
+3     PBMC_10k#AAACAGCCAAT..          C5
+4     PBMC_10k#AAACAGCCACC..          C5
+5     PBMC_10k#AAACAGCCAGT..          C5
+...                      ...         ...
+9996  PBMC_10k#TTTGTTGGTGA..          C5
+9997  PBMC_10k#TTTGTTGGTGT..          C5
+9998  PBMC_10k#TTTGTTGGTTA..          C4
+9999  PBMC_10k#TTTGTTGGTTG..          C6
+10000 PBMC_10k#TTTGTTGGTTT..          C6
+
+2021-07-28 13:00:06 : Creating Cluster Matrix on the total Group Features, 1.567 mins elapsed.
+2021-07-28 13:03:23 : Computing Variable Features, 4.85 mins elapsed.
+###########
+2021-07-28 13:03:24 : Running LSI (2 of 2) on Variable Features, 4.855 mins elapsed.
+###########
+2021-07-28 13:03:24 : Creating Partial Matrix, 4.855 mins elapsed.
+2021-07-28 13:03:50 : Computing LSI, 5.289 mins elapsed.
+
+2021-07-28 13:03:50 : LSI Parameters, Class = list
+
+LSI Parameters$: length = 1
+                       
+1 function (name)      
+2 .Internal(args(name))
+
+
+LSI Parameters$mat: nRows = 25000, nCols = 10387
+LSI Parameters$mat: NonZeroEntries = 37799235, EntryRange = [ 1 , 1 ]
+5 x 5 sparse Matrix of class "dgCMatrix"
+     PBMC_10k#TAGCTAGGTTTGGGTA-1 PBMC_10k#TTGGAGGCAGGCTTCG-1 PBMC_10k#CATAGACTCCCTGGAA-1 PBMC_10k#GGTGAGTAGGCGTAAA-1
+[1,]                           .                           1                           .                           1
+[2,]                           .                           1                           .                           .
+[3,]                           .                           .                           .                           .
+[4,]                           1                           .                           .                           .
+[5,]                           1                           1                           1                           .
+     PBMC_10k#ATTTGCAAGCCGCAAC-1
+[1,]                           1
+[2,]                           .
+[3,]                           1
+[4,]                           .
+[5,]                           1
+
+
+LSI Parameters$LSIMethod: length = 1
+[1] 2
+
+
+LSI Parameters$scaleTo: length = 1
+[1] 10000
+
+
+LSI Parameters$nDimensions: length = 1
+[1] 30
+
+
+LSI Parameters$binarize: length = 1
+[1] TRUE
+
+
+LSI Parameters$outlierQuantiles: length = 2
+[1] 0.02 0.98
+
+
+LSI Parameters$seed: length = 1
+[1] 1
+
+
+LSI Parameters$verbose: length = 1
+[1] FALSE
+
+
+LSI Parameters$tstart: length = 1
+[1] "2021-07-28 12:58:32 EDT"
+
+
+LSI Parameters$logFile: length = 1
+[1] "ArchRLogs/ArchR-addIterativeLSI-23bf694a5088-Date-2021-07-28_Time-12-58-32.log"
+
+
+2021-07-28 13:03:50 : Running LSI, Input Matrix = 0.455 GB, 5.295 mins elapsed.
+2021-07-28 13:03:50 : Binarizing Matrix, 5.295 mins elapsed.
+2021-07-28 13:03:50 : Computing Term Frequency, 5.301 mins elapsed.
+2021-07-28 13:03:50 : Filtering Outliers Based On Counts, 5.302 mins elapsed.
+2021-07-28 13:03:51 : Removing 0 Sum Rows, 5.31 mins elapsed.
+2021-07-28 13:03:52 : Computing Inverse Document Frequency, 5.328 mins elapsed.
+2021-07-28 13:03:53 : Computing SVD using irlba, 5.347 mins elapsed.
+2021-07-28 13:04:09 : Projecting Outliers with LSI-Projection (Granja* et al 2019), 5.603 mins elapsed.
+
+2021-07-28 13:04:09 : LSI-Projection Parameters, Class = list
+
+LSI-Projection Parameters$: length = 1
+                       
+1 function (name)      
+2 .Internal(args(name))
+
+
+LSI-Projection Parameters$mat: nRows = 25000, nCols = 10
+LSI-Projection Parameters$mat: NonZeroEntries = 63484, EntryRange = [ 1 , 1 ]
+5 x 5 sparse Matrix of class "dgCMatrix"
+     PBMC_10k#TAGCTAGGTTTGGGTA-1 PBMC_10k#GGTGAGTAGGCGTAAA-1 PBMC_10k#AGTTTGATCCTAAGTA-1 PBMC_10k#TCTCAAGCAATGCCCG-1
+[1,]                           .                           1                           .                           1
+[2,]                           .                           .                           .                           1
+[3,]                           .                           .                           .                           1
+[4,]                           1                           .                           1                           .
+[5,]                           1                           .                           1                           .
+     PBMC_10k#GCTCGATCATCAGTAT-1
+[1,]                           .
+[2,]                           1
+[3,]                           1
+[4,]                           1
+[5,]                           .
+
+
+LSI-Projection Parameters$matSVD: nRows = 9971, nCols = 30
+                                  LSI1       LSI2      LSI3        LSI4      LSI5
+PBMC_10k#TAGCTAGGTTTGGGTA-1  -99.42969 -23.539238 -2.926630   0.9848118 -1.323336
+PBMC_10k#GGTGAGTAGGCGTAAA-1 -101.13686 -18.720598 45.423154   0.8022809 -7.832855
+PBMC_10k#AGTTTGATCCTAAGTA-1  -90.73744   3.399331 -6.767416 -12.7862358  1.707381
+PBMC_10k#TCTCAAGCAATGCCCG-1 -102.74763 -19.631869 -6.955717  31.0124651  3.247260
+PBMC_10k#GCTCGATCATCAGTAT-1 -107.46638 -15.487443 -6.728365  -4.1409701  1.305050
+
+
+LSI-Projection Parameters$returnModel: length = 1
+[1] FALSE
+
+
+LSI-Projection Parameters$verbose: length = 1
+[1] FALSE
+
+
+LSI-Projection Parameters$tstart: length = 0
+NULL
+
+
+LSI-Projection Parameters$logFile: length = 1
+[1] "ArchRLogs/ArchR-addIterativeLSI-23bf694a5088-Date-2021-07-28_Time-12-58-32.log"
+
+
+2021-07-28 13:04:09 : Projecting LSI, Input Matrix = 0.001 GB, 0 mins elapsed.
+2021-07-28 13:04:09 : Subsetting by Non-Zero features in inital Matrix, 0 mins elapsed.
+2021-07-28 13:04:09 : Binarizing Matrix, 0 mins elapsed.
+2021-07-28 13:04:09 : Computing Term Frequency, 0 mins elapsed.
+2021-07-28 13:04:09 : Computing Inverse Document Frequency, 0 mins elapsed.
+2021-07-28 13:04:09 : Computing TF-IDF Matrix, 0 mins elapsed.
+2021-07-28 13:04:09 : Calculating V Matrix, 0.007 mins elapsed.
+2021-07-28 13:04:09 : Computing Projected Coordinates, 0.007 mins elapsed.
+
+2021-07-28 13:04:09 : LSI-Projection Parameters, Class = list
+
+LSI-Projection Parameters$: length = 1
+                       
+1 function (name)      
+2 .Internal(args(name))
+
+
+LSI-Projection Parameters$mat: nRows = 25000, nCols = 416
+LSI-Projection Parameters$mat: NonZeroEntries = 1953854, EntryRange = [ 1 , 1 ]
+5 x 5 sparse Matrix of class "dgCMatrix"
+     PBMC_10k#TTGGAGGCAGGCTTCG-1 PBMC_10k#CATAGACTCCCTGGAA-1 PBMC_10k#ATTTGCAAGCCGCAAC-1 PBMC_10k#TATAGGTGTCATCAAG-1
+[1,]                           1                           .                           1                           .
+[2,]                           1                           .                           .                           1
+[3,]                           .                           .                           1                           .
+[4,]                           .                           .                           .                           .
+[5,]                           1                           1                           1                           1
+     PBMC_10k#AAACCGCGTACTTCAC-1
+[1,]                           1
+[2,]                           .
+[3,]                           1
+[4,]                           .
+[5,]                           1
+
+
+LSI-Projection Parameters$matSVD: nRows = 9971, nCols = 30
+                                  LSI1       LSI2      LSI3        LSI4      LSI5
+PBMC_10k#TAGCTAGGTTTGGGTA-1  -99.42969 -23.539238 -2.926630   0.9848118 -1.323336
+PBMC_10k#GGTGAGTAGGCGTAAA-1 -101.13686 -18.720598 45.423154   0.8022809 -7.832855
+PBMC_10k#AGTTTGATCCTAAGTA-1  -90.73744   3.399331 -6.767416 -12.7862358  1.707381
+PBMC_10k#TCTCAAGCAATGCCCG-1 -102.74763 -19.631869 -6.955717  31.0124651  3.247260
+PBMC_10k#GCTCGATCATCAGTAT-1 -107.46638 -15.487443 -6.728365  -4.1409701  1.305050
+
+
+LSI-Projection Parameters$returnModel: length = 1
+[1] FALSE
+
+
+LSI-Projection Parameters$verbose: length = 1
+[1] FALSE
+
+
+LSI-Projection Parameters$tstart: length = 0
+NULL
+
+
+LSI-Projection Parameters$logFile: length = 1
+[1] "ArchRLogs/ArchR-addIterativeLSI-23bf694a5088-Date-2021-07-28_Time-12-58-32.log"
+
+
+2021-07-28 13:04:09 : Projecting LSI, Input Matrix = 0.023 GB, 0 mins elapsed.
+2021-07-28 13:04:09 : Subsetting by Non-Zero features in inital Matrix, 0 mins elapsed.
+2021-07-28 13:04:09 : Binarizing Matrix, 0 mins elapsed.
+2021-07-28 13:04:09 : Computing Term Frequency, 0.001 mins elapsed.
+2021-07-28 13:04:09 : Computing Inverse Document Frequency, 0.001 mins elapsed.
+2021-07-28 13:04:09 : Computing TF-IDF Matrix, 0.001 mins elapsed.
+2021-07-28 13:04:09 : Calculating V Matrix, 0.008 mins elapsed.
+2021-07-28 13:04:10 : Computing Projected Coordinates, 0.009 mins elapsed.
+2021-07-28 13:04:10 : Finished LSI (TF-IDF SVD) using irlba, 5.62 mins elapsed.
+
+2021-07-28 13:04:10 : outLSI-2, Class = SimpleList
+
+outLSI-2$matSVD: nRows = 10387, nCols = 30
+                                  LSI1      LSI2     LSI3       LSI4      LSI5
+PBMC_10k#TAGCTAGGTTTGGGTA-1  -99.42969 -23.53924 -2.92663  0.9848118 -1.323336
+PBMC_10k#TTGGAGGCAGGCTTCG-1 -142.65590 -38.37672 22.98370 18.2027905  5.536127
+PBMC_10k#CATAGACTCCCTGGAA-1 -110.41151 -36.61599 -7.16520 -3.9276717  1.936965
+PBMC_10k#GGTGAGTAGGCGTAAA-1 -101.13686 -18.72060 45.42315  0.8022809 -7.832855
+PBMC_10k#ATTTGCAAGCCGCAAC-1 -136.30473 -41.97432 30.93941 -5.2575697  3.371070
+
+
+outLSI-2$rowSm: length = 25000
+[1] 1875 2048 1699 1449 1538 2362
+
+
+outLSI-2$nCol: length = 1
+[1] 9971
+
+
+outLSI-2$exclude: length = 0
+NULL
+
+
+outLSI-2$idx: length = 25000
+[1] 1 2 3 4 5 6
+
+
+outLSI-2$u: nRows = 25000, nCols = 30
+             [,1]         [,2]         [,3]         [,4]          [,5]
+[1,] -0.007183052 -0.003744470 -0.001652688 -0.005071413  0.0001081200
+[2,] -0.007709066  0.002655958 -0.001402731  0.001083567  0.0002486589
+[3,] -0.006847571  0.004231667  0.016473023 -0.006817830 -0.0050690588
+[4,] -0.006221276  0.006502824 -0.001484495 -0.002846213  0.0017622788
+[5,] -0.006435775  0.006699514  0.008877508 -0.005644455  0.0042368771
+
+
+outLSI-2$v: nRows = 9971, nCols = 30
+            [,1]         [,2]         [,3]          [,4]         [,5]
+[1,] -0.01380970 -0.008320125 -0.001985368  0.0008361164 -0.001581463
+[2,] -0.01404681 -0.006616939  0.030814167  0.0006811455 -0.009360711
+[3,] -0.01260244  0.001201520 -0.004590881 -0.0108556592  0.002040418
+[4,] -0.01427053 -0.006939035 -0.004718620  0.0263299345  0.003880663
+[5,] -0.01492591 -0.005474156 -0.004564389 -0.0035157306  0.001559610
+
+
+outLSI-2$binarize: length = 1
+[1] TRUE
+
+
+outLSI-2$scaleTo: length = 1
+[1] 10000
+
+
+outLSI-2$nDimensions: length = 1
+[1] 30
+
+
+outLSI-2$LSIMethod: length = 1
+[1] 2
+
+
+outLSI-2$outliers: length = 416
+[1] "PBMC_10k#TTGGAGGCAGGCTTCG-1" "PBMC_10k#CATAGACTCCCTGGAA-1" "PBMC_10k#ATTTGCAAGCCGCAAC-1" "PBMC_10k#TATAGGTGTCATCAAG-1"
+[5] "PBMC_10k#AAACCGCGTACTTCAC-1" "PBMC_10k#ACGAACAAGACACTTA-1"
+
+
+outLSI-2$date: length = 1
+[1] "2021-07-28"
+
+
+outLSI-2$seed: length = 1
+[1] 1
+
+
+outLSI-2$scaleDims: length = 1
+[1] TRUE
+
+
+outLSI-2$useMatrix: length = 1
+[1] "TileMatrix"
+
+
+outLSI-2$tileSize: length = 1
+[1] 500
+
+
+2021-07-28 13:04:11 : Finished Running IterativeLSI, 5.639 mins elapsed.

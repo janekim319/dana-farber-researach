@@ -1,0 +1,386 @@
+
+           ___      .______        ______  __    __  .______      
+          /   \     |   _  \      /      ||  |  |  | |   _  \     
+         /  ^  \    |  |_)  |    |  ,----'|  |__|  | |  |_)  |    
+        /  /_\  \   |      /     |  |     |   __   | |      /     
+       /  _____  \  |  |\  \\___ |  `----.|  |  |  | |  |\  \\___.
+      /__/     \__\ | _| `._____| \______||__|  |__| | _| `._____|
+    
+Logging With ArchR!
+
+Start Time : 2021-07-21 16:47:37
+
+------- ArchR Info
+
+ArchRThreads = 6
+ArchRGenome = Hg19
+
+------- System Info
+
+Computer OS = unix
+Total Cores = 8
+
+------- Session Info
+
+R version 4.1.0 (2021-05-18)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Big Sur 11.2.3
+
+Matrix products: default
+LAPACK: /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] parallel  stats4    stats     graphics  grDevices utils     datasets  methods  
+[9] base     
+
+other attached packages:
+ [1] BSgenome.Hsapiens.UCSC.hg19_1.4.3 BSgenome_1.60.0                  
+ [3] rtracklayer_1.52.0                Biostrings_2.60.1                
+ [5] XVector_0.32.0                    ArchR_1.0.1                      
+ [7] magrittr_2.0.1                    rhdf5_2.36.0                     
+ [9] Matrix_1.3-4                      data.table_1.14.0                
+[11] SummarizedExperiment_1.22.0       Biobase_2.52.0                   
+[13] GenomicRanges_1.44.0              GenomeInfoDb_1.28.1              
+[15] IRanges_2.26.0                    S4Vectors_0.30.0                 
+[17] BiocGenerics_0.38.0               MatrixGenerics_1.4.0             
+[19] matrixStats_0.59.0                ggplot2_3.3.5                    
+
+loaded via a namespace (and not attached):
+  [1] Seurat_4.0.3             Rtsne_0.15               colorspace_2.0-2        
+  [4] rjson_0.2.20             deldir_0.2-10            ellipsis_0.3.2          
+  [7] ggridges_0.5.3           rstudioapi_0.13          spatstat.data_2.1-0     
+ [10] leiden_0.3.8             listenv_0.8.0            ggrepel_0.9.1           
+ [13] fansi_0.5.0              codetools_0.2-18         splines_4.1.0           
+ [16] knitr_1.33               polyclip_1.10-0          jsonlite_1.7.2          
+ [19] Rsamtools_2.8.0          Cairo_1.5-12.2           ica_1.0-2               
+ [22] cluster_2.1.2            png_0.1-7                uwot_0.1.10             
+ [25] shiny_1.6.0              sctransform_0.3.2        spatstat.sparse_2.0-0   
+ [28] BiocManager_1.30.16      compiler_4.1.0           httr_1.4.2              
+ [31] SeuratObject_4.0.2       fastmap_1.1.0            lazyeval_0.2.2          
+ [34] later_1.2.0              htmltools_0.5.1.1        tools_4.1.0             
+ [37] igraph_1.2.6             gtable_0.3.0             glue_1.4.2              
+ [40] GenomeInfoDbData_1.2.6   RANN_2.6.1               reshape2_1.4.4          
+ [43] dplyr_1.0.7              Rcpp_1.0.7               scattermore_0.7         
+ [46] rhdf5filters_1.4.0       vctrs_0.3.8              nlme_3.1-152            
+ [49] lmtest_0.9-38            xfun_0.24                stringr_1.4.0           
+ [52] globals_0.14.0           mime_0.11                miniUI_0.1.1.1          
+ [55] lifecycle_1.0.0          irlba_2.3.3              restfulr_0.0.13         
+ [58] XML_3.99-0.6             goftest_1.2-2            future_1.21.0           
+ [61] MASS_7.3-54              zlibbioc_1.38.0          zoo_1.8-9               
+ [64] scales_1.1.1             spatstat.core_2.3-0      promises_1.2.0.1        
+ [67] spatstat.utils_2.2-0     RColorBrewer_1.1-2       yaml_2.2.1              
+ [70] reticulate_1.20          pbapply_1.4-3            gridExtra_2.3           
+ [73] rpart_4.1-15             stringi_1.7.3            BiocIO_1.2.0            
+ [76] BiocParallel_1.26.1      rlang_0.4.11             pkgconfig_2.0.3         
+ [79] bitops_1.0-7             lattice_0.20-44          Rhdf5lib_1.14.2         
+ [82] ROCR_1.0-11              purrr_0.3.4              tensor_1.5              
+ [85] GenomicAlignments_1.28.0 patchwork_1.1.1          htmlwidgets_1.5.3       
+ [88] cowplot_1.1.1            tidyselect_1.1.1         parallelly_1.27.0       
+ [91] RcppAnnoy_0.0.18         plyr_1.8.6               R6_2.5.0                
+ [94] generics_0.1.0           DelayedArray_0.18.0      pillar_1.6.1            
+ [97] withr_2.4.2              mgcv_1.8-36              fitdistrplus_1.1-5      
+[100] survival_3.2-11          abind_1.4-5              RCurl_1.98-1.3          
+[103] tibble_3.1.2             future.apply_1.7.0       crayon_1.4.1            
+[106] KernSmooth_2.23-20       utf8_1.2.1               spatstat.geom_2.2-2     
+[109] plotly_4.9.4.1           grid_4.1.0               digest_0.6.27           
+[112] xtable_1.8-4             tidyr_1.1.3              httpuv_1.6.1            
+[115] munsell_0.5.0            viridisLite_0.4.0       
+
+
+------- Log Info
+
+
+2021-07-21 16:47:37 : createArrowFiles Input-Parameters, Class = list
+
+createArrowFiles Input-Parameters$inputFiles: length = 3
+                                      scATAC_BMMC_R1 
+     "HemeFragments/scATAC_BMMC_R1.fragments.tsv.gz" 
+                                 scATAC_CD34_BMMC_R1 
+"HemeFragments/scATAC_CD34_BMMC_R1.fragments.tsv.gz" 
+                                      scATAC_PBMC_R1 
+     "HemeFragments/scATAC_PBMC_R1.fragments.tsv.gz" 
+
+
+createArrowFiles Input-Parameters$sampleNames: length = 3
+[1] "scATAC_BMMC_R1"      "scATAC_CD34_BMMC_R1" "scATAC_PBMC_R1"     
+
+
+createArrowFiles Input-Parameters$outputNames: length = 3
+[1] "scATAC_BMMC_R1"      "scATAC_CD34_BMMC_R1" "scATAC_PBMC_R1"     
+
+
+createArrowFiles Input-Parameters$validBarcodes: length = 0
+NULL
+
+
+createArrowFiles Input-Parameters$minTSS: length = 1
+[1] 4
+
+
+createArrowFiles Input-Parameters$minFrags: length = 1
+[1] 1000
+
+
+createArrowFiles Input-Parameters$maxFrags: length = 1
+[1] 1e+05
+
+
+createArrowFiles Input-Parameters$QCDir: length = 1
+[1] "QualityControl"
+
+
+createArrowFiles Input-Parameters$nucLength: length = 1
+[1] 147
+
+
+createArrowFiles Input-Parameters$promoterRegion: length = 2
+[1] 2000  100
+
+
+createArrowFiles Input-Parameters$excludeChr: length = 2
+[1] "chrM" "chrY"
+
+
+createArrowFiles Input-Parameters$nChunk: length = 1
+[1] 5
+
+
+createArrowFiles Input-Parameters$bcTag: length = 1
+[1] "qname"
+
+
+createArrowFiles Input-Parameters$gsubExpression: length = 0
+NULL
+
+
+createArrowFiles Input-Parameters$bamFlag: length = 0
+NULL
+
+
+createArrowFiles Input-Parameters$offsetPlus: length = 1
+[1] 4
+
+
+createArrowFiles Input-Parameters$offsetMinus: length = 1
+[1] -5
+
+
+createArrowFiles Input-Parameters$addTileMat: length = 1
+[1] TRUE
+
+
+createArrowFiles Input-Parameters$addGeneScoreMat: length = 1
+[1] TRUE
+
+
+createArrowFiles Input-Parameters$force: length = 1
+[1] FALSE
+
+
+createArrowFiles Input-Parameters$threads: length = 1
+[1] 6
+
+
+createArrowFiles Input-Parameters$parallelParam: length = 0
+NULL
+
+
+createArrowFiles Input-Parameters$subThreading: length = 1
+[1] TRUE
+
+
+createArrowFiles Input-Parameters$verbose: length = 1
+[1] TRUE
+
+
+createArrowFiles Input-Parameters$cleanTmp: length = 1
+[1] TRUE
+
+
+createArrowFiles Input-Parameters$logFile: length = 1
+[1] "ArchRLogs/ArchR-createArrows-35b922b7458-Date-2021-07-21_Time-16-47-36.log"
+
+
+createArrowFiles Input-Parameters$filterFrags: length = 1
+[1] 1000
+
+
+createArrowFiles Input-Parameters$filterTSS: length = 1
+[1] 4
+
+
+
+2021-07-21 16:47:37 : Cleaning Temporary Files
+2021-07-21 16:47:37 : Batch Execution w/ safelapply!, 0 mins elapsed.
+
+###########
+2021-07-21 16:47:37 : Creating Arrow File scATAC_CD34_BMMC_R1.arrow (scATAC_CD34_BMMC_R1 : 2 of 3)
+###########
+
+
+###########
+2021-07-21 16:47:37 : Creating Arrow File scATAC_PBMC_R1.arrow (scATAC_PBMC_R1 : 3 of 3)
+###########
+
+
+###########
+2021-07-21 16:47:37 : Creating Arrow File scATAC_BMMC_R1.arrow (scATAC_BMMC_R1 : 1 of 3)
+###########
+
+
+2021-07-21 16:47:37 : validBC, Class = NULL
+
+2021-07-21 16:47:37 : validBC, Class = NULL
+
+2021-07-21 16:47:37 : validBC, Class = NULL
+
+
+
+validBC: length = 0
+validBC: length = 0
+validBC: length = 0
+NULL
+NULL
+NULL
+
+
+
+
+
+
+
+2021-07-21 16:47:37 : (scATAC_PBMC_R1 : 3 of 3) Determining Arrow Method to use!
+
+2021-07-21 16:47:37 : (scATAC_BMMC_R1 : 1 of 3) Determining Arrow Method to use!
+
+2021-07-21 16:47:37 : (scATAC_CD34_BMMC_R1 : 2 of 3) Determining Arrow Method to use!
+2021-07-21 16:47:40 : (scATAC_PBMC_R1 : 3 of 3) Reading In Fragments from inputFiles (readMethod = tabix), 0.059 mins elapsed.
+2021-07-21 16:47:40 : (scATAC_PBMC_R1 : 3 of 3) Tabix Bed To Temporary File, 0.06 mins elapsed.
+
+2021-07-21 16:47:40 : tileChromSizes, Class = GRanges
+GRanges object with 120 ranges and 1 metadata column:
+        seqnames              ranges strand |     chunkName
+           <Rle>           <IRanges>  <Rle> |   <character>
+    [1]     chr1          1-49850124      * |   chr1#chunk1
+    [2]     chr1   49850125-99700248      * |   chr1#chunk2
+    [3]     chr1  99700249-149550372      * |   chr1#chunk3
+    [4]     chr1 149550373-199400496      * |   chr1#chunk4
+    [5]     chr1 199400497-249250621      * |   chr1#chunk5
+    ...      ...                 ...    ... .           ...
+  [116]     chrY          1-11874713      * | chrY#chunk116
+  [117]     chrY   11874714-23749426      * | chrY#chunk117
+  [118]     chrY   23749427-35624139      * | chrY#chunk118
+  [119]     chrY   35624140-47498852      * | chrY#chunk119
+  [120]     chrY   47498853-59373566      * | chrY#chunk120
+  -------
+  seqinfo: 24 sequences from an unspecified genome; no seqlengths
+
+2021-07-21 16:47:41 : (scATAC_CD34_BMMC_R1 : 2 of 3) Reading In Fragments from inputFiles (readMethod = tabix), 0.07 mins elapsed.
+2021-07-21 16:47:41 : (scATAC_CD34_BMMC_R1 : 2 of 3) Tabix Bed To Temporary File, 0.07 mins elapsed.
+
+2021-07-21 16:47:41 : tileChromSizes, Class = GRanges
+GRanges object with 120 ranges and 1 metadata column:
+        seqnames              ranges strand |     chunkName
+           <Rle>           <IRanges>  <Rle> |   <character>
+    [1]     chr1          1-49850124      * |   chr1#chunk1
+    [2]     chr1   49850125-99700248      * |   chr1#chunk2
+    [3]     chr1  99700249-149550372      * |   chr1#chunk3
+    [4]     chr1 149550373-199400496      * |   chr1#chunk4
+    [5]     chr1 199400497-249250621      * |   chr1#chunk5
+    ...      ...                 ...    ... .           ...
+  [116]     chrY          1-11874713      * | chrY#chunk116
+  [117]     chrY   11874714-23749426      * | chrY#chunk117
+  [118]     chrY   23749427-35624139      * | chrY#chunk118
+  [119]     chrY   35624140-47498852      * | chrY#chunk119
+  [120]     chrY   47498853-59373566      * | chrY#chunk120
+  -------
+  seqinfo: 24 sequences from an unspecified genome; no seqlengths
+
+2021-07-21 16:47:42 : (scATAC_BMMC_R1 : 1 of 3) Reading In Fragments from inputFiles (readMethod = tabix), 0.096 mins elapsed.
+2021-07-21 16:47:43 : (scATAC_BMMC_R1 : 1 of 3) Tabix Bed To Temporary File, 0.098 mins elapsed.
+
+2021-07-21 16:47:44 : tileChromSizes, Class = GRanges
+GRanges object with 120 ranges and 1 metadata column:
+        seqnames              ranges strand |     chunkName
+           <Rle>           <IRanges>  <Rle> |   <character>
+    [1]     chr1          1-49850124      * |   chr1#chunk1
+    [2]     chr1   49850125-99700248      * |   chr1#chunk2
+    [3]     chr1  99700249-149550372      * |   chr1#chunk3
+    [4]     chr1 149550373-199400496      * |   chr1#chunk4
+    [5]     chr1 199400497-249250621      * |   chr1#chunk5
+    ...      ...                 ...    ... .           ...
+  [116]     chrY          1-11874713      * | chrY#chunk116
+  [117]     chrY   11874714-23749426      * | chrY#chunk117
+  [118]     chrY   23749427-35624139      * | chrY#chunk118
+  [119]     chrY   35624140-47498852      * | chrY#chunk119
+  [120]     chrY   47498853-59373566      * | chrY#chunk120
+  -------
+  seqinfo: 24 sequences from an unspecified genome; no seqlengths
+
+
+2021-07-21 16:47:50 : (scATAC_CD34_BMMC_R1 : 2 of 3) .tabixToTmp Fragments-Chunk-(1 of 120)-chr1:1-49850124, Class = data.table
+ 
+2021-07-21 16:47:50 : (scATAC_CD34_BMMC_R1 : 2 of 3) .tabixToTmp Fragments-Chunk-(1 of 120)-chr1:1-49850124, Class = data.frame
+(scATAC_CD34_BMMC_R1 : 2 of 3) .tabixToTmp Fragments-Chunk-(1 of 120)-chr1:1-49850124: nRows = 456085, nCols = 3
+
+2021-07-21 16:47:51 : (scATAC_PBMC_R1 : 3 of 3) .tabixToTmp Fragments-Chunk-(1 of 120)-chr1:1-49850124, Class = data.table
+ 
+2021-07-21 16:47:51 : (scATAC_PBMC_R1 : 3 of 3) .tabixToTmp Fragments-Chunk-(1 of 120)-chr1:1-49850124, Class = data.frame
+(scATAC_PBMC_R1 : 3 of 3) .tabixToTmp Fragments-Chunk-(1 of 120)-chr1:1-49850124: nRows = 384110, nCols = 3
+
+
+
+2021-07-21 16:47:52 : (scATAC_CD34_BMMC_R1 : 2 of 3) .tabixToTmp Barcodes-Chunk-(1 of 120)-chr1:1-49850124, Class = character
+
+(scATAC_CD34_BMMC_R1 : 2 of 3) .tabixToTmp Barcodes-Chunk-(1 of 120)-chr1:1-49850124: length = 3700
+[1] "ATTTGTCTCAATCGTG-1" "CACATGAGTGATAAGT-1" "GCATTCCTCGTTGTTT-1"
+[4] "TGTACAGAGGTAGGAA-1" "GTGGATTCAATGACTC-1" "TGCTTTAGTAACAATG-1"
+
+
+
+
+
+2021-07-21 16:47:53 : (scATAC_PBMC_R1 : 3 of 3) .tabixToTmp Barcodes-Chunk-(1 of 120)-chr1:1-49850124, Class = character
+
+(scATAC_PBMC_R1 : 3 of 3) .tabixToTmp Barcodes-Chunk-(1 of 120)-chr1:1-49850124: length = 2966
+[1] "CAGGGCTTCTTTCGAT-1" "GATGATCCACGTTACA-1" "TTTGCGCTCTATCTAC-1"
+[4] "ATGTACGAGTATGCTC-1" "ACCGAATCAACGGGTA-1" "CCGTGAGAGACCATAA-1"
+
+
+
+2021-07-21 16:48:03 : (scATAC_BMMC_R1 : 1 of 3) .tabixToTmp Fragments-Chunk-(1 of 120)-chr1:1-49850124, Class = data.table
+ 
+2021-07-21 16:48:03 : (scATAC_BMMC_R1 : 1 of 3) .tabixToTmp Fragments-Chunk-(1 of 120)-chr1:1-49850124, Class = data.frame
+(scATAC_BMMC_R1 : 1 of 3) .tabixToTmp Fragments-Chunk-(1 of 120)-chr1:1-49850124: nRows = 505916, nCols = 3
+
+
+
+2021-07-21 16:48:06 : (scATAC_BMMC_R1 : 1 of 3) .tabixToTmp Barcodes-Chunk-(1 of 120)-chr1:1-49850124, Class = character
+
+(scATAC_BMMC_R1 : 1 of 3) .tabixToTmp Barcodes-Chunk-(1 of 120)-chr1:1-49850124: length = 5000
+[1] "TAGGAGGGTTAACCGT-1" "CCTTGGTAGTTCTCCC-1" "GCCAGCAGTTCTGAGT-1"
+[4] "TAGCATGGTGACCAGA-1" "GCCCAGAAGTGTCACT-1" "GTGCCAGTCAAGGCAG-1"
+
+
+2021-07-21 16:52:53 : (scATAC_PBMC_R1 : 3 of 3) Reading TabixFile 4 Percent, 5.263 mins elapsed.
+2021-07-21 16:52:53 : (scATAC_CD34_BMMC_R1 : 2 of 3) Reading TabixFile 4 Percent, 5.263 mins elapsed.
+2021-07-21 16:53:03 : (scATAC_BMMC_R1 : 1 of 3) Reading TabixFile 4 Percent, 5.428 mins elapsed.
+2021-07-21 17:00:32 : (scATAC_PBMC_R1 : 3 of 3) Reading TabixFile 8 Percent, 12.924 mins elapsed.
+2021-07-21 17:00:32 : (scATAC_CD34_BMMC_R1 : 2 of 3) Reading TabixFile 8 Percent, 12.924 mins elapsed.
+2021-07-21 17:00:32 : (scATAC_BMMC_R1 : 1 of 3) Reading TabixFile 8 Percent, 12.929 mins elapsed.
+2021-07-21 17:05:15 : (scATAC_PBMC_R1 : 3 of 3) Reading TabixFile 12 Percent, 17.636 mins elapsed.
+2021-07-21 17:05:15 : (scATAC_CD34_BMMC_R1 : 2 of 3) Reading TabixFile 12 Percent, 17.636 mins elapsed.
+2021-07-21 17:06:59 : (scATAC_BMMC_R1 : 1 of 3) Reading TabixFile 12 Percent, 19.366 mins elapsed.
+2021-07-21 17:12:00 : (scATAC_CD34_BMMC_R1 : 2 of 3) Reading TabixFile 17 Percent, 24.386 mins elapsed.
+2021-07-21 17:12:00 : (scATAC_PBMC_R1 : 3 of 3) Reading TabixFile 17 Percent, 24.385 mins elapsed.
+2021-07-21 17:15:31 : (scATAC_PBMC_R1 : 3 of 3) Reading TabixFile 21 Percent, 27.903 mins elapsed.
+2021-07-21 17:15:31 : (scATAC_CD34_BMMC_R1 : 2 of 3) Reading TabixFile 21 Percent, 27.903 mins elapsed.
+2021-07-21 17:16:18 : (scATAC_BMMC_R1 : 1 of 3) Reading TabixFile 17 Percent, 28.667 mins elapsed.
+2021-07-21 17:22:06 : (scATAC_PBMC_R1 : 3 of 3) Reading TabixFile 25 Percent, 34.492 mins elapsed.
+2021-07-21 17:22:06 : (scATAC_CD34_BMMC_R1 : 2 of 3) Reading TabixFile 25 Percent, 34.492 mins elapsed.
+2021-07-21 17:22:07 : (scATAC_BMMC_R1 : 1 of 3) Reading TabixFile 21 Percent, 34.496 mins elapsed.
+2021-07-21 17:26:22 : (scATAC_PBMC_R1 : 3 of 3) Reading TabixFile 29 Percent, 38.752 mins elapsed.
+2021-07-21 17:26:22 : (scATAC_CD34_BMMC_R1 : 2 of 3) Reading TabixFile 29 Percent, 38.753 mins elapsed.
