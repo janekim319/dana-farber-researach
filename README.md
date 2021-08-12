@@ -4,13 +4,16 @@ Summer of 2021, I worked at Dr. Shirley Liu's Lab at the Dana Farber Cancer Inst
 
 The two main tools I used are MAESTRO and ArchR. On a High Computing Server, I performed analysis on the scATAC-seq multiome data obtained from 10X genomics using MAESTRO, developed by the Liu Lab. I also ran ArchR using RStudio on the same data to compare the clustering results of the two tools. I also used the Seurat package to transfer the cell annotations from scRNA-seq data to scATAC-seq data in multiome data. 
 
-Every week, I presented my results to the lab, consisted of scientists working on single cell data analysis. 
+Every week, I presented my results to the lab, consisted of scientists working on single cell data analysis. The slides from the 3 presentations can be found below.
 
 ## Documentations for ArchR
 
 ArchR Github Page: https://github.com/GreenleafLab/ArchR/discussions
+
 ArchR Full Tutorial: https://www.archrproject.com/bookdown/getting-started-with-archr.html
+
 ArchR Function Descriptions: https://www.archrproject.com/reference/index.html
+
 ArchR Multiome PBMC 10X data analysis: https://greenleaflab.github.io/ArchR_2020/Ex-Analyze-Multiome.html
 
 ## Tutorial for MAESTRO
