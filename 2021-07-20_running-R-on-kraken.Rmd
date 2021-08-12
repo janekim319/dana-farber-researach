@@ -1,0 +1,36 @@
+---
+title: "2012-07-20-running_R_on_kraken"
+author: "Jane Kim"
+date: "7/20/2021"
+output: html_document
+---
+
+```{bash}
+ssh janekim@kraken.dfci.harvard.edu
+srun -t 1600 --mem=60G -c 4 --pty bash
+```
+
+https://cimac-cidc.github.io/CIDC-bioinformatics-computation-wiki/kraken/kraken_rstudio/
+https://csgillespie.github.io/efficientR/set-up.html#r-startup
+https://www.r-bloggers.com/2020/10/customizing-your-package-library-location/
+
+```{bash}
+module load singularity
+mkdir singularity_images; cd !$
+singularity pull --name geospatial_4.1.0.simg docker://rocker/geospatial:4.1.0
+```
+
+make a file named rstudio.sh
+```{bash}
+#! /bin/bash
+set -euo pipefail
+
+module load singularity
+# Need a unique /tmp for this job for /tmp/rstudio-rsession & /tmp/rstudio-server
+WORKDIR=/liulab/${USER}/singularity_images
+mkdir -m 700 -p ${WORKDIR}/tmp2
+mkdir -m 700 -p ${WORKDIR}/tmp
+
+PASSWORD='xyz' singularity exec --bind "${WORKDIR}/tmp2:/var/run/rstudio-server" --bind "${WORKDIR}/tmp:/tmp" --bind="/liulab/${USER}" geospatial_4.0.2.simg rserver --www-port 8888 --auth-none=0 --auth-pam-helper-path=pam-helper --www-address=127.0.0.1
+```
+

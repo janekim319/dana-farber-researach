@@ -1,0 +1,80 @@
+---
+title: "2021-07-23_MAESTRO-with-fragment-file"
+author: "Jane Kim"
+date: "7/23/2021"
+output: html_document
+---
+
+```{bash}
+ssh janekim@kraken.dfci.harvard.edu
+```
+
+- always start a new job to get on the interactive node
+```{bash, eval = FALSE}
+srun -t 1600 --mem=60G -c 4 --pty bash
+```
+
+```{bash}
+# inside the folder that will be containing the data
+curl -O https://cf.10xgenomics.com/samples/cell-arc/1.0.0/pbmc_granulocyte_sorted_10k/pbmc_granulocyte_sorted_10k_atac_fragments.tsv.gz
+```
+
+- loading MAESTRO
+```{bash}
+source /liulab/galib/mini2/bin/activate MAESTRO_1.5.0.1
+```
+
+```{bash}
+MAESTRO scatac-init --input_path /liulab/janekim/comparison/data \
+--species GRCh38 --platform 10x-genomics --format fragments --mapping chromap \
+--giggleannotation /liulab/galib/sc_CIDC/annotations/giggle.all/  \
+--deduplication cell-level \
+--gzip \
+--fasta /references/Refdata_scATAC_MAESTRO_GRCh38_1.1.0/GRCh38_genome.fa \
+--index /liulab/galib/sc_CIDC/references/chromap/GRCh38_chromap.index \
+--whitelist /liulab/galib/sc_CIDC/references/whitelist/737K-cratac-v1.txt \
+--cores 16 --directory atac_pbmc_500_nextgem_chromap \
+--annotation --method RP-based --signature human.immune.CIBERSORT \
+--rpmodel Enhanced \
+--peak_cutoff 100 --count_cutoff 1000 --frip_cutoff 0.2 --cell_cutoff 50
+
+```
+
+
+```{bash}
+cd atac_pbmc_500_nextgem_chromap
+
+MAESTRO samples-init --assay_type scatac --platform 10x-genomics --data_type fragment --data_dir /liulab/janekim/comparison/data
+```
+
+Good practice to check samples.json and config.yaml here
+
+```{bash}
+cat config.yaml
+cat samples.json
+```
+
+```{bash}
+snakemake -np
+```
+
+
+- SBATCH -c should be >= snakemake --cores
+
+```{bash}
+#!/bin/bash
+#SBATCH -c 32 #Number of cores
+#SBATCH -o %j.out
+#SBATCH -e %j.err
+#SBATCH --mem=120G
+#SBATCH -J chrom-single
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=jeongeun_kim@dfci.harvard.edu
+
+source /liulab/galib/mini2/bin/activate MAESTRO_1.5.0.1
+time snakemake --rerun-incomplete -j 16
+
+```
+
+
+

@@ -1,0 +1,119 @@
+---
+title: "2021-08-05_variable-bins-ArchR"
+author: "Jane Kim"
+date: "8/5/2021"
+output: html_document
+---
+
+```{r}
+projfilter2 <- loadArchRProject("/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/Save-projfilter2")
+```
+```{r}
+getAvailableMatrices(projfilter2)
+```
+
+```{r}
+tilefeatures <- getFeatures(
+  ArchRProj = projfilter2,
+  useMatrix = "TileMatrix",
+  select = NULL,
+  ignoreCase = TRUE
+)
+```
+
+```{r}
+reduceddims <- getReducedDims(
+  ArchRProj = projfilter2,
+  reducedDims = "LSI_ATAC_res0.6",
+  returnMatrix = TRUE,
+  dimsToUse = NULL,
+  scaleDims = NULL,
+  corCutOff = 0.75
+)
+
+```
+
+```{r}
+tilematrix <- getMatrixFromProject(
+  ArchRProj = projfilter2,
+  useMatrix = "TileMatrix",
+  useSeqnames = NULL,
+  verbose = TRUE,
+  binarize = TRUE,
+  threads = getArchRThreads(),
+  logFile = createLogFile("getMatrixFromProject")
+)
+
+```
+```{r}
+head(tilematrix@assays@data@listData[["TileMatrix"]])
+```
+
+```{r}
+projfilter2 <- addIterativeLSI(
+    ArchRProj = projfilter2, 
+    clusterParams = list(
+      resolution = 0.6, # change this to 0.6 
+      sampleCells = 10000,
+      n.start = 10
+    ),
+    iterations = 1,
+    saveIterations = FALSE,
+    useMatrix = "TileMatrix", 
+    depthCol = "nFrags",
+    name = "LSI_ATAC_res0.6_iter1"
+)
+```
+```{r}
+projfilter2 <- addUMAP(projfilter2, reducedDims = "LSI_ATAC_res0.6_iter1", name = "UMAP_ATAC_res0.6_iter1", minDist = 0.8, force = TRUE)
+```
+```{r}
+projfilter2 <- addClusters(projfilter2, reducedDims = "LSI_ATAC_res0.6_iter1", name = "Clusters_ATAC_iter1", resolution = 0.6, force = TRUE)
+```
+
+```{r}
+umap_iter1 <- plotEmbedding(projfilter2, name = "Clusters_ATAC_iter1", embedding = "UMAP_ATAC_res0.6_iter1", size = 1.5, labelAsFactors=F, labelMeans=F)
+umap_iter1
+```
+```{r}
+projfilter2 <- addIterativeLSI(
+    ArchRProj = projfilter2, 
+    clusterParams = list(
+      resolution = 0.6, # change this to 0.6 
+      sampleCells = 10000,
+      n.start = 10
+    ),
+    iterations = 3,
+    saveIterations = TRUE,
+    useMatrix = "TileMatrix", 
+    depthCol = "nFrags",
+    name = "LSI_ATAC_save_iters"
+)
+```
+
+```{r}
+tileMatrix <- getMatrixFromProject(
+  ArchRProj = projfilter2,
+  useMatrix = "TileMatrix",
+  binarize = TRUE
+)
+```
+```{r}
+print(tileMatrix@assays@data$TileMatrix)
+```
+```{r}
+projfilter2 <- addIterativeLSI(
+    ArchRProj = projfilter2, 
+    clusterParams = list(
+      resolution = 0.6, # change this to 0.6 
+      sampleCells = 10000,
+      n.start = 10
+    ),
+    iterations = 3,
+    saveIterations = TRUE,
+    useMatrix = "TileMatrix", 
+    depthCol = "nFrags",
+    name = "LSI_ATAC_save_iters_3"
+)
+```
+

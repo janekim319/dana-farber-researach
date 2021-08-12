@@ -1,0 +1,117 @@
+---
+title: "2021-07-28_quantitative-comparison"
+author: "Jane Kim"
+date: "7/28/2021"
+output: html_document
+---
+
+```{r}
+devtools::install_github("crazyhottommy/scclusteval")
+install.packages("tidyverse")
+```
+
+```{r}
+library(scclusteval)
+library(tidyverse)
+library(patchwork)
+library(Seurat)
+```
+```{r}
+archr <- readRDS("/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/Save-projfilter1/Save-ArchR-Project.rds")
+
+maestro <- readRDS("/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/data/pbmc_granulocyte_sorted_10k_atac_scATAC_Object.rds")
+```
+
+
+```{r}
+# read in the seurat object
+sc_10x_5cl_seurat<- readRDS("/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/data/sc_10x_5cl_seruat.rds")
+
+subsample_idents<- readRDS("/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/data/gather_subsample.rds")
+
+fullsample_idents<- readRDS("/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/data/gather_full_sample.rds")
+
+```
+
+```{r}
+fullsample_idents
+```
+
+```{r}
+head(maestro$ATAC$ATAC_snn_res.0.6)
+```
+```{r}
+head(archr@cellColData[,"Clusters", drop=FALSE])
+```
+
+Because the number of cells in MAESTRO and ArchR are different, we will have to find the intersect of the cells that are found in both ArchR and MAESTRO. 
+```{r}
+length(maestro$ATAC$ATAC_snn_res.0.6)
+dim(archr@cellColData[,"Clusters", drop=FALSE])
+```
+```{r}
+class(maestro$ATAC$ATAC_snn_res.0.6)
+```
+```{r}
+str(archr@cellColData[,"Clusters", drop=FALSE])
+```
+```{r}
+archr_idents <- archr@cellColData[,"Clusters", drop=FALSE]
+maestro_idents <- maestro$ATAC$ATAC_snn_res.0.6
+```
+
+
+```{r}
+archr_idents$Clusters <- as.factor(archr_idents$Clusters)
+```
+
+```{r}
+levels(archr_idents$Clusters)
+```
+```{r}
+levels(maestro_idents)
+```
+```{r}
+names(maestro_idents)
+```
+Renaming ArchR barcode names because ArchR appends sample name in front of the barcode name. Therefore, removing the sample name. 
+```{r}
+rownames(archr_idents) <- gsub("PBMC_10k#", "", rownames(archr_idents))
+```
+
+There are 
+```{r}
+length(intersect(names(maestro_idents), rownames(archr_idents)))
+```
+```{r}
+length(intersect(rownames(archr_idents), names(maestro_idents)))
+```
+
+```{r}
+test <- as.vector(archr_idents)
+```
+```{r}
+archr_idents
+```
+```{r}
+archr_idents_vectorized <- factor(archr_idents$Clusters, levels = c("C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12", "C13", "C14", "C15", "C16", "C17"))
+names(archr_idents_vectorized) <- rownames(archr_idents)
+```
+
+```{r}
+PairWiseJaccardSetsHeatmap(archr_idents_vectorized,
+                          maestro_idents,
+                          title = "MAESTRO clusters",
+                          #column_title = "MAESTRO clusters",
+                          row_title = "ArchR clusters",
+                          show_heatmap_legend = TRUE,
+                          column_title_side = "bottom",
+                           show_row_dend = F, show_column_dend = F,
+                           cluster_row = F, cluster_column =F)
+```
+```{r}
+archr_idents_binmethod <- factor(archr$Clusters_ATAC, levels = c("C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12", "C13", "C14", "C15", "C16", "C17", "C18", "C19", "C20", "C21"))
+
+#Renaming ArchR barcode names because ArchR appends sample name in front of the barcode name. Therefore, removing the sample name. 
+names(archr_idents_0.6) <- gsub("PBMC_10k#", "", rownames(archr_0.6))
+```

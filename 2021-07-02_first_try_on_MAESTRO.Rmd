@@ -1,0 +1,68 @@
+---
+title: "skttools and kraken"
+author: "Jane Kim"
+date: "7/8/2021"
+output: html_document
+---
+
+1. Kraken
+```{bash, eval= FALSE}
+ssh janekim@kraken.dfci.harvard.edu
+```
+
+- always start a new job to get on the interactive node
+```{bash, eval = FALSE}
+srun -t 1600 --mem=60G -c 4 --pty bash
+```
+
+- accessing the fast (IO intensive) cluster filesystem: need to be on work node to access this
+```{bash}
+cd /cluster/liulab/janekim
+```
+
+2. scATAC-seq
+
+1) Data Preparataion
+```{bash}
+mkdir maestro_practice
+cd maestro_practice
+mkdir data
+cd data
+
+vim SraAccList.txt
+```
+
+- loading skttools
+```{bash}
+source /liulab/galib/mini2/bin/activate # (same as /liulab/galib/mini2/bin/fastq-dump -h)
+```
+
+
+- skip prefetch, instead when you run fastq-dump, run the accession numbers without the .sra extension. For example, {i} and not {i}.sra (reference: https://www.ncbi.nlm.nih.gov/sra/docs/sradownload/)
+```{bash}
+#!/bin/bash
+#SBATCH -t 0-10:00
+#SBATCH --mem=60G
+#SBATCH -c 12
+#SBATCH -o split.out
+#SBATCH -e split.err
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=jeongeun_kim@dfci.harvard.edu
+
+source /liulab/galib/mini2/bin/activate
+cat SraAccList.txt | while read i
+  do
+    time fastq-dump --gzip -split-files ${i}
+    echo "** ${i} to fastq done **"
+  done
+
+```
+
+*** this step took 5-6 hours
+
+
+
+
+
+
+

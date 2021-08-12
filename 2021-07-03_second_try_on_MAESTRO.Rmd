@@ -1,0 +1,96 @@
+---
+title: "MAESTRO"
+output: html_notebook
+---
+
+2) Configure the MAESTRO workflow
+
+- loading MAESTRO
+```{bash}
+source /liulab/galib/mini2/bin/activate MAESTRO_1.5.0.1
+```
+
+- giggle annotation file: /liulab/galib/sc_CIDC/annotations/giggle.all/
+- genome fasta file: /liulab/galib/sc_CIDC/references/Refdata_scATAC_MAESTRO_GRCh38_1.1.0/GRCh38_genome.fa
+- build reference index file for chromap: /liulab/galib/sc_CIDC/references/whitelist/737K-cratac-v1.txt
+
+```{bash}
+MAESTRO scatac-init --batch --bulk_peaks --downsample \
+--target_reads 5000000 --input_path /cluster/liulab/janekim/maestro_practice/data \
+--gzip --platform 10x-genomics --format fastq --species GRCh38 \
+--deduplication cell-level --mapping chromap \
+--giggleannotation /liulab/galib/sc_CIDC/annotations/giggle.all/ \
+--fasta /liulab/galib/sc_CIDC/references/Refdata_scATAC_MAESTRO_GRCh38_1.1.0/GRCh38_genome.fa \
+--index /liulab/galib/sc_CIDC/references/chromap/GRCh38_chromap.index \
+--whitelist /liulab/galib/sc_CIDC/references/whitelist/737K-cratac-v1.txt \
+--cores 16 --directory multi-scatac-chromap \
+--annotation --method RP-based --signature human.immune.CIBERSORT \
+--clusterpeak --shortpeak \
+--rpmodel Enhanced \
+--peak_cutoff 100 --count_cutoff 1000 --frip_cutoff 0.2 --cell_cutoff 500
+```
+
+=> the step above creates a directory named multi-scatac-chromap
+
+3) Configure samples.json file
+```{bash}
+cd multi-scatac-chromap
+
+MAESTRO samples-init --assay_type scatac --platform 10x-genomics --data_type fastq --data_dir /cluster/liulab/janekim/maestro_practice/data
+```
+
+4) Run Snakemake pipeline
+```{bash}
+snakemake -np # dry run
+nohup snakemake --cores 32 > multi-scatac-chromap &
+
+```
+
+*** I originally submitted this as a job, but I don't think that works... nohup does it automatically... instead just run this line directly: nohup snakemake --cores 32 > multi-scatac-chromap & ***
+
+SBATCH -c should be >= snakemake --cores
+
+```{bash}
+#!/bin/bash
+#SBATCH -t 0-20:00
+#SBATCH --mem=60G
+#SBATCH -c 12
+#SBATCH -o final_run.out
+#SBATCH -e final_run.err
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=jeongeun_kim@dfci.harvard.edu
+
+source /liulab/galib/mini2/bin/activate MAESTRO_1.5.0.1
+nohup snakemake --cores 32 > multi-scatac-chromap & # get rid of > multi-scatac-chromap &
+
+```
+
+Gali's script.. this works!
+absolute path: 
+```{bash}
+#!/bin/bash
+#SBATCH -c 32 #Number of cores
+#SBATCH -o %j.txt
+#SBATCH --mem=120G
+#SBATCH -J chrom-multi
+
+source /liulab/galib/mini2/bin/activate MAESTRO_1.5.0
+time snakemake --rerun-incomplete -j 16
+```
+
+```{bash}
+#!/bin/bash
+#SBATCH -c 32 #Number of cores
+#SBATCH -o %j.out
+#SBATCH -e %j.err
+#SBATCH --mem=120G
+#SBATCH -J chrom-multi
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=jeongeun_kim@dfci.harvard.edu
+
+source /liulab/galib/mini2/bin/activate MAESTRO_1.5.0.1
+time snakemake --rerun-incomplete -j 16
+
+```
+
+Reference: https://slurm.schedmd.com/sbatch.html

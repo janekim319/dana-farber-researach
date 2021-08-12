@@ -1,0 +1,232 @@
+---
+title: "2021-08-04_scRNA"
+author: "Jane Kim"
+date: "8/4/2021"
+output: html_document
+---
+
+```{r}
+devtools::install_github('satijalab/seurat-data')
+library(SeuratData)
+InstallData("pbmcMultiome")
+```
+```{r}
+BiocManager::install("EnsDb.Hsapiens.v86")
+```
+
+```{r}
+library(Seurat)
+library(Signac)
+library(EnsDb.Hsapiens.v86)
+library(ggplot2)
+library(cowplot)
+```
+
+```{r}
+pbmc.rna <- LoadData("pbmcMultiome", "pbmc.rna")
+pbmc.atac <- LoadData("pbmcMultiome", "pbmc.atac")
+```
+```{r}
+# repeat QC steps performed in the WNN vignette
+pbmc.rna <- subset(pbmc.rna, seurat_annotations != "filtered")
+pbmc.atac <- subset(pbmc.atac, seurat_annotations != "filtered")
+```
+
+```{r}
+# Perform standard analysis of each modality independently RNA analysis
+pbmc.rna <- NormalizeData(pbmc.rna)
+pbmc.rna <- FindVariableFeatures(pbmc.rna)
+pbmc.rna <- ScaleData(pbmc.rna)
+pbmc.rna <- RunPCA(pbmc.rna)
+pbmc.rna <- RunUMAP(pbmc.rna, dims = 1:30)
+```
+
+```{r}
+# ATAC analysis add gene annotation information
+annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
+seqlevelsStyle(annotations) <- "UCSC"
+genome(annotations) <- "hg38"
+Annotation(pbmc.atac) <- annotations
+```
+
+```{r}
+pbmc.atac <- RunTFIDF(pbmc.atac)
+pbmc.atac <- FindTopFeatures(pbmc.atac, min.cutoff = "q0")
+pbmc.atac <- RunSVD(pbmc.atac)
+pbmc.atac <- RunUMAP(pbmc.atac, reduction = "lsi", dims = 2:30, reduction.name = "umap.atac", reduction.key = "atacUMAP_")
+```
+```{r}
+p1 <- DimPlot(pbmc.rna, group.by = "seurat_annotations", label = TRUE) + NoLegend() + ggtitle("RNA")
+p2 <- DimPlot(pbmc.atac, group.by = "orig.ident", label = FALSE) + NoLegend() + ggtitle("ATAC")
+p1 + p2
+```
+
+Identifying anchors between scRNA-seq and scATAC-seq datasets
+```{r}
+# quantify gene activity
+gene.activities <- GeneActivity(pbmc.atac, features = VariableFeatures(pbmc.rna))
+
+# add gene activities as a new assay
+pbmc.atac[["ACTIVITY"]] <- CreateAssayObject(counts = gene.activities)
+
+# normalize gene activities
+DefaultAssay(pbmc.atac) <- "ACTIVITY"
+pbmc.atac <- NormalizeData(pbmc.atac)
+pbmc.atac <- ScaleData(pbmc.atac, features = rownames(pbmc.atac))
+```
+
+```{r}
+# Identify anchors
+transfer.anchors <- FindTransferAnchors(reference = pbmc.rna, query = pbmc.atac, features = VariableFeatures(object = pbmc.rna),
+    reference.assay = "RNA", query.assay = "ACTIVITY", reduction = "cca")
+```
+
+Annotate via label transfer
+```{r}
+celltype.predictions <- TransferData(anchorset = transfer.anchors, refdata = pbmc.rna$seurat_annotations,
+    weight.reduction = pbmc.atac[["lsi"]], dims = 2:30)
+
+pbmc.atac <- AddMetaData(pbmc.atac, metadata = celltype.predictions)
+```
+
+```{r}
+pbmc.atac$annotation_correct <- pbmc.atac$predicted.id == pbmc.atac$seurat_annotations
+p1 <- DimPlot(pbmc.atac, group.by = "predicted.id", label = TRUE) + NoLegend() + ggtitle("Predicted annotation")
+p2 <- DimPlot(pbmc.atac, group.by = "seurat_annotations", label = TRUE) + NoLegend() + ggtitle("Ground-truth annotation")
+p1 | p2
+```
+
+```{r}
+predictions <- table(pbmc.atac$seurat_annotations, pbmc.atac$predicted.id)
+predictions <- predictions/rowSums(predictions)  # normalize for number of cells in each cell type
+predictions <- as.data.frame(predictions)
+p1 <- ggplot(predictions, aes(Var1, Var2, fill = Freq)) + geom_tile() + scale_fill_gradient(name = "Fraction of cells",
+    low = "#ffffc8", high = "#7d0025") + xlab("Cell type annotation (RNA)") + ylab("Predicted cell type label (ATAC)") +
+    theme_cowplot() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+correct <- length(which(pbmc.atac$seurat_annotations == pbmc.atac$predicted.id))
+incorrect <- length(which(pbmc.atac$seurat_annotations != pbmc.atac$predicted.id))
+data <- FetchData(pbmc.atac, vars = c("prediction.score.max", "annotation_correct"))
+p2 <- ggplot(data, aes(prediction.score.max, fill = annotation_correct, colour = annotation_correct)) +
+    geom_density(alpha = 0.5) + theme_cowplot() + scale_fill_discrete(name = "Annotation Correct",
+    labels = c(paste0("FALSE (n = ", incorrect, ")"), paste0("TRUE (n = ", correct, ")"))) + scale_color_discrete(name = "Annotation Correct",
+    labels = c(paste0("FALSE (n = ", incorrect, ")"), paste0("TRUE (n = ", correct, ")"))) + xlab("Prediction Score")
+p1 + p2
+```
+```{r}
+p1
+```
+```{r}
+p2
+```
+
+```{r}
+genes.use <- VariableFeatures(pbmc.rna)
+refdata <- GetAssayData(pbmc.rna, assay = "RNA", slot = "data")[genes.use, ]
+
+# refdata (input) contains a scRNA-seq expression matrix for the scRNA-seq cells.  imputation
+# (output) will contain an imputed scRNA-seq matrix for each of the ATAC cells
+imputation <- TransferData(anchorset = transfer.anchors, refdata = refdata, weight.reduction = pbmc.atac[["lsi"]],
+    dims = 2:30)
+pbmc.atac[["RNA"]] <- imputation
+
+coembed <- merge(x = pbmc.rna, y = pbmc.atac)
+
+# Finally, we run PCA and UMAP on this combined object, to visualize the co-embedding of both
+# datasets
+coembed <- ScaleData(coembed, features = genes.use, do.scale = FALSE)
+coembed <- RunPCA(coembed, features = genes.use, verbose = FALSE)
+coembed <- RunUMAP(coembed, dims = 1:30)
+
+```
+
+```{r}
+atac.maestro <- readRDS("/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/data/pbmc_granulocyte_sorted_10k_atac_scATAC_Object.rds")
+atac.maestro <- atac.maestro$ATAC
+atac.maestro
+```
+```{r}
+Idents(atac.maestro) <- atac.maestro$orig.ident
+DefaultAssay(atac.maestro) <- 'ATAC'
+```
+
+```{r}
+p1 <- DimPlot(pbmc.rna, group.by = "seurat_annotations", label = TRUE) + NoLegend() + ggtitle("RNA")
+p2 <- DimPlot(atac.maestro, group.by = "orig.ident", label = FALSE) + NoLegend() + ggtitle("ATAC")
+p1 + p2
+```
+```{r}
+# Identify anchors
+transfer.anchors <- FindTransferAnchors(reference = pbmc.rna, query = atac.maestro, features = VariableFeatures(object = pbmc.rna),
+    reference.assay = "RNA", query.assay = "ACTIVITY", reduction = "cca")
+```
+
+
+```{r}
+celltype.predictions <- TransferData(anchorset = transfer.anchors, refdata = pbmc.rna$seurat_annotations,
+    weight.reduction = atac.maestro[["lsi"]], dims = 2:30)
+
+atac.maestro <- AddMetaData(atac.maestro, metadata = celltype.predictions)
+```
+```{r}
+common_cells <- intersect(rownames(atac.maestro@meta.data), rownames(pbmc.rna@meta.data))
+```
+
+```{r}
+pbmc.rna.subset <- subset(pbmc.rna, cells = common_cells)
+atac.maestro.subset <- subset(atac.maestro, cells = common_cells)
+```
+
+```{r}
+p1 <- DimPlot(pbmc.rna.subset, group.by = "seurat_annotations", label = TRUE) + NoLegend() + ggtitle("RNA")
+p2 <- DimPlot(atac.maestro.subset, group.by = "orig.ident", label = FALSE) + NoLegend() + ggtitle("ATAC")
+p1 + p2
+```
+
+```{r}
+#atac.maestro$annotation_correct <- atac.maestro$predicted.id == atac.maestro$seurat_annotations
+atac.maestro.subset$annotation_correct <- atac.maestro.subset$predicted.id == pbmc.rna.subset$seurat_annotations
+atac.maestro.subset@meta.data$true_label <- pbmc.rna.subset$seurat_annotations
+p1 <- DimPlot(atac.maestro.subset, group.by = "predicted.id", label = TRUE) + NoLegend() + ggtitle("Predicted annotation")
+p2 <- DimPlot(atac.maestro.subset, group.by = "true_label", label = TRUE) + NoLegend() + ggtitle("Ground-truth annotation")
+p1 | p2
+```
+
+```{r}
+predictions <- table(atac.maestro.subset$true_label, atac.maestro.subset$predicted.id)
+predictions <- predictions/rowSums(predictions)  # normalize for number of cells in each cell type
+predictions <- as.data.frame(predictions)
+p1 <- ggplot(predictions, aes(Var1, Var2, fill = Freq)) + geom_tile() + scale_fill_gradient(name = "Fraction of cells",
+    low = "#ffffc8", high = "#7d0025") + xlab("Cell type annotation (RNA)") + ylab("Predicted cell type label (ATAC)") +
+    theme_cowplot() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+correct <- length(which(atac.maestro.subset$true_label == atac.maestro.subset$predicted.id))
+incorrect <- length(which(atac.maestro.subset$true_label != atac.maestro.subset$predicted.id))
+data <- FetchData(atac.maestro, vars = c("prediction.score.max", "annotation_correct"))
+p2 <- ggplot(data, aes(prediction.score.max, fill = annotation_correct, colour = annotation_correct)) +
+    geom_density(alpha = 0.5) + theme_cowplot() + scale_fill_discrete(name = "Annotation Correct",
+    labels = c(paste0("FALSE (n = ", incorrect, ")"), paste0("TRUE (n = ", correct, ")"))) + scale_color_discrete(name = "Annotation Correct",
+    labels = c(paste0("FALSE (n = ", incorrect, ")"), paste0("TRUE (n = ", correct, ")"))) + xlab("Prediction Score")
+p1 | p2
+```
+```{r}
+p1
+```
+```{r}
+p2
+```
+```{r}
+# accuracy
+sum(atac.maestro.subset$true_label==atac.maestro.subset$predicted.id) / length(atac.maestro.subset$true_label)
+```
+
+ArchR and RNA-seq
+```{r}
+archr_proj <- loadArchRProject("/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/Save-projfilter2")
+```
+
+```{r}
+p2 <- DimPlot(archr_proj@sampleColData, label = FALSE) + NoLegend() + ggtitle("ATAC")
+p2
+```
+

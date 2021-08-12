@@ -1,0 +1,15 @@
+---
+title: "2021-08-09_FindVariableFeatures-seurat"
+author: "Jane Kim"
+date: "8/9/2021"
+output: html_document
+---
+
+```{r}
+library(Seurat)
+```
+
+```{r}
+atac.archr <- readRDS("/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/Save-Projfilter2/Save-ArchR-Project.rds")
+```
+

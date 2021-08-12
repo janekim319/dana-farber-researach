@@ -1,0 +1,254 @@
+---
+title: "2021-07-21_ArchR-first-try"
+author: "Jane Kim"
+date: "7/21/2021"
+output: html_document
+---
+
+```{r}
+library(ArchR)
+```
+
+Benchmark dataset:
+https://satijalab.org/seurat/articles/atacseq_integration_vignette.html
+
+```{r}
+addArchRThreads(threads = 4)
+addArchRGenome("hg19")
+```
+
+```{r}
+inputFiles <- getTutorialData("Hematopoiesis")
+inputFiles
+```
+
+```{r}
+ArrowFiles <- createArrowFiles(
+  inputFiles = inputFiles,
+  sampleNames = names(inputFiles),
+  filterTSS = 4, #filter out cells with a TSS enrichment score lower than this number
+  filterFrags = 1000, # number of unique nuclear fragments
+  addTileMat = TRUE,
+  addGeneScoreMat = TRUE
+)
+```
+
+```{r}
+# if R^2 is less than 0.9, it means my sample is already homogenous which may be better to skip doublet elimination
+doubScores <- addDoubletScores(
+    input = ArrowFiles,
+    k = 10, #Refers to how many cells near a "pseudo-doublet" to count.
+    knnMethod = "UMAP", #Refers to the embedding to use for nearest neighbor search with doublet projection.
+    LSIMethod = 1
+)
+```
+```{r}
+projHeme1 <- ArchRProject(
+  ArrowFiles = ArrowFiles, 
+  outputDirectory = "HemeTutorial",
+  copyArrows = TRUE #This is recommened so that if you modify the Arrow files you have an original copy for later usage.
+)
+```
+```{r}
+projHeme1
+```
+```{r}
+getAvailableMatrices(projHeme1)
+```
+```{r}
+getMatrixFromProject(
+  ArchRProj = projHeme1,
+  useMatrix = "TileMatrix",
+  binarize = TRUE
+)
+```
+
+```{r}
+tileMatrix <- getMatrixFromProject(
+  ArchRProj = projHeme1,
+  useMatrix = "TileMatrix",
+  binarize = TRUE
+)
+```
+```{r}
+head(tileMatrix@assays@data$TileMatrix)
+```
+
+```{r}
+library(dplyr)
+```
+```{r}
+unique(tileMatrix@assays@data$TileMatrix[1,])
+```
+6072620 bins x 10660 cells
+4932 cells for BMMC
+3275 cells for CD34_BMMC
+2453 cells for PBMC
+
+```{r}
+dim(tileMatrix@assays@data$TileMatrix)
+```
+```{r}
+length(grep('scATAC_BMMC', colnames(tileMatrix@assays@data$TileMatrix), value=TRUE))
+```
+```{r}
+length(grep('scATAC_CD34_BMMC', colnames(tileMatrix@assays@data$TileMatrix), value=TRUE))
+```
+```{r}
+length(grep('scATAC_PBMC', colnames(tileMatrix@assays@data$TileMatrix), value=TRUE))
+```
+```{r}
+4932+3275+2453
+```
+```{r}
+# adding a column of more readable sample names
+bioNames <- gsub("_R2|_R1|scATAC_","",projHeme1$Sample)
+head(bioNames)
+
+```
+
+```{r}
+df <- getCellColData(projHeme1, select = c("log10(nFrags)", "TSSEnrichment"))
+df
+```
+
+```{r}
+p <- ggPoint(
+    x = df[,1], 
+    y = df[,2], 
+    colorDensity = TRUE,
+    continuousSet = "sambaNight",
+    xlabel = "Log10 Unique Fragments",
+    ylabel = "TSS Enrichment",
+    xlim = c(log10(500), quantile(df[,1], probs = 0.99)),
+    ylim = c(0, quantile(df[,2], probs = 0.99))
+) + geom_hline(yintercept = 4, lty = "dashed") + geom_vline(xintercept = 3, lty = "dashed")
+
+p
+```
+```{r}
+# to save the plot above
+plotPDF(p, name = "TSS-vs-Frags.pdf", ArchRProj = projHeme1, addDOC = FALSE)
+```
+
+```{r}
+saveArchRProject(ArchRProj = projHeme1, outputDirectory = "Save-ProjHeme1", load = FALSE)
+# there's something about load = TRUE
+```
+1. Doublet Removal
+
+```{r}
+projHeme2 <- filterDoublets(projHeme1)
+```
+2. Dimension Reduction
+- Similar to Signac, which uses a term frequency that has been depth normalized to a constant (10,000) followed by normalization with the inverse document frequency and then log-transforming the resultant matrix
+- using peak regions for LSI is inherently challenging because we do not have clusters or cluster-specific peaks prior to dimensionality reduction
+- “estimated LSI” approach that performs the initial dimensionality reduction on a subset of the total cells
+- LSI is not deterministic => set seed?
+- The most common parameters to tweak are iterations, varFeatures, and resolution
+
+Process below took 2 minutes
+
+```{r}
+# create a reducedDims object called “IterativeLSI"
+set.seed(123)
+projHeme2 <- addIterativeLSI(
+    ArchRProj = projHeme2,
+    useMatrix = "TileMatrix", 
+    name = "IterativeLSI", 
+    iterations = 2, 
+    clusterParams = list( #See Seurat::FindClusters
+        resolution = c(0.2), 
+        sampleCells = 10000, 
+        n.start = 10
+    ), 
+    varFeatures = 25000, 
+    dimsToUse = 1:30
+)
+```
+3. Batch effect removal
+Skipping 1 packages not available: SingleCellExperiment
+```{r}
+install.packages("harmony")
+```
+
+```{r}
+# creates a new reducedDims object called Harmony
+projHeme2 <- addHarmony(
+    ArchRProj = projHeme2,
+    reducedDims = "IterativeLSI",
+    name = "Harmony",
+    groupBy = "Sample"
+)
+```
+4. Clustering
+- using Seurat for clustering: deterministic... same output everytime
+- below took 0.3 mins
+```{r}
+projHeme2 <- addClusters(
+    input = projHeme2,
+    reducedDims = "IterativeLSI",
+    method = "Seurat",
+    name = "Clusters",
+    resolution = 0.8
+)
+```
+```{r}
+# shows cluster ID for each single cell
+head(projHeme2$Clusters)
+```
+```{r}
+table(projHeme2$Clusters)
+```
+cluster confusion matrix across each sample
+```{r}
+cM <- confusionMatrix(paste0(projHeme2$Clusters), paste0(projHeme2$Sample))
+cM
+```
+```{r}
+library(pheatmap)
+cM <- cM / Matrix::rowSums(cM)
+p <- pheatmap::pheatmap(
+    mat = as.matrix(cM), 
+    color = paletteContinuous("whiteBlue"), 
+    border_color = "black"
+)
+p
+```
+Cells from a single cluster may appear in multiple different areas of the embedding. In these contexts, it is appropriate to adjust the clustering parameters or embedding parameters until there is agreement between the two.
+
+5. Visualization (Embedding)
+- t-SNE: preserve the local structure in the data
+- UMAP is designed to preserve both the local and most of the global structure in the data
+- the distance between two clusters is not informative in t-SNE but is informative in UMAP
+- neither of them are deterministic
+1) UMAP
+```{r}
+projHeme2 <- addUMAP(
+    ArchRProj = projHeme2, 
+    reducedDims = "IterativeLSI", 
+    name = "UMAP", # this name will be used in plotEmbedding()
+    nNeighbors = 30, 
+    minDist = 0.5, 
+    metric = "cosine"
+)
+```
+projHeme2@cellColData$Sample is equal to projHeme$Sample
+
+```{r}
+p1 <- plotEmbedding(ArchRProj = projHeme2, colorBy = "cellColData", name = "Sample", embedding = "UMAP")
+```
+```{r}
+p2 <- plotEmbedding(ArchRProj = projHeme2, colorBy = "cellColData", name = "Clusters", embedding = "UMAP")
+```
+```{r}
+ggAlignPlots(p1, p2, type = "h")
+```
+```{r}
+data1 <- read.csv("./HemeFragments/scATAC_BMMC_R1.fragments.tsv.gz", header = FALSE, sep="")
+```
+
+```{r}
+mydata <- read.csv("./comparison/pbmc_10k/pbmc_granulocyte_sorted_10k_atac_fragments.tsv.gz", header = FALSE, sep = "", nrows =5)
+```
+

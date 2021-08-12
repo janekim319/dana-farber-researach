@@ -1,0 +1,101 @@
+---
+title: "2021-07-29_resolution-0.6-comparison"
+author: "Jane Kim"
+date: "7/29/2021"
+output: html_document
+---
+
+```{r}
+library(scclusteval)
+library(tidyverse)
+library(patchwork)
+library(Seurat)
+```
+
+```{r}
+archr_0.6 <- readRDS("/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/Save-projfilter2/Save-ArchR-Project.rds")
+
+maestro <- readRDS("/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/data/pbmc_granulocyte_sorted_10k_atac_scATAC_Object.rds")
+```
+
+
+```{r}
+archr_idents_0.6 <- factor(archr_0.6$Clusters_res0.6, levels = c("C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12", "C13", "C14", "C15", "C16", "C17", "C18", "C19", "C20", "C21"))
+
+#Renaming ArchR barcode names because ArchR appends sample name in front of the barcode name. Therefore, removing the sample name. 
+names(archr_idents_0.6) <- gsub("PBMC_10k#", "", rownames(archr_0.6))
+```
+
+```{r}
+maestro_idents <- maestro$ATAC$ATAC_snn_res.0.6
+```
+
+```{r}
+levels(archr_idents_0.6)
+length(levels(archr_idents_0.6))
+```
+```{r}
+levels(maestro_idents)
+length(levels(maestro_idents))
+```
+
+```{r}
+PairWiseJaccardSetsHeatmap(archr_idents_0.6,
+                          maestro_idents,
+                          title = "MAESTRO clusters",
+                          #column_title = "MAESTRO clusters",
+                          row_title = "ArchR clusters",
+                          show_heatmap_legend = TRUE,
+                          column_title_side = "bottom",
+                           show_row_dend = F, show_column_dend = F,
+                           cluster_row = F, cluster_column =F)
+```
+Comparing MAESTRO with LSI ATAC res 0.6 AND addCluster 0.6
+
+```{r}
+archr_idents_bin_method <- factor(projfilter1$Clusters_binmethod_res0.6, levels = c("C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12", "C13", "C14", "C15", "C16", "C17", "C18", "C19"))
+
+#Renaming ArchR barcode names because ArchR appends sample name in front of the barcode name. Therefore, removing the sample name. 
+names(archr_idents_bin_method) <- gsub("PBMC_10k#", "", rownames(projfilter1))
+```
+
+```{r}
+levels(archr_idents_bin_method)
+length(levels(archr_idents_bin_method))
+```
+
+```{r}
+PairWiseJaccardSetsHeatmap(archr_idents_bin_method,
+                          maestro_idents,
+                          title = "MAESTRO clusters",
+                          #column_title = "MAESTRO clusters",
+                          row_title = "ArchR clusters",
+                          show_heatmap_legend = TRUE,
+                          column_title_side = "bottom",
+                           show_row_dend = F, show_column_dend = F,
+                           cluster_row = F, cluster_column =F)
+```
+MAESTRO and ArchR with one iteration Comparison
+```{r}
+archr_iter1 <- factor(projfilter2$Clusters_ATAC_iter1, levels = c("C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12", "C13", "C14", "C15", "C16"))
+
+#Renaming ArchR barcode names because ArchR appends sample name in front of the barcode name. Therefore, removing the sample name. 
+names(archr_iter1) <- gsub("PBMC_10k#", "", rownames(projfilter2))
+```
+
+```{r}
+unique(archr_iter1)
+```
+
+
+```{r}
+PairWiseJaccardSetsHeatmap(archr_iter1,
+                          maestro_idents,
+                          title = "MAESTRO clusters",
+                          #column_title = "MAESTRO clusters",
+                          row_title = "ArchR clusters",
+                          show_heatmap_legend = TRUE,
+                          column_title_side = "bottom",
+                           show_row_dend = F, show_column_dend = F,
+                           cluster_row = F, cluster_column =F)
+```

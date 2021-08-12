@@ -1,0 +1,41 @@
+---
+title: "2021-08-04_MAESTRO-peak-analysis"
+author: "Jane Kim"
+date: "8/4/2021"
+output: html_document
+---
+
+```{r}
+BiocManager::install("EnsDb.Mmusculus.v79")
+install_github("liulab-dfci/MAESTRO")
+```
+
+```{r}
+library(Seurat)
+library(MAESTRO)
+```
+
+
+```{r}
+pbmc.peak <- Read10X_h5('/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/MAESTRO_data/pbmc_granulocyte_sorted_10k_atac_filtered_peak_count.h5', use.names = TRUE, unique.features = TRUE)
+```
+```{r}
+head(pbmc.peak)
+```
+
+```{r}
+n <- length(strsplit(rownames(pbmc.peak), '[_]')[[1]])
+DF <- structure(strsplit(rownames(pbmc.peak), '[_]'), row.names = c(NA, -n), class = "data.frame")
+DF <- transpose(DF)
+colnames(DF) <- c("chr", "start", "end")
+```
+
+```{r}
+write.table(DF, "maestro_peak.bed", append = FALSE, sep =  "\t", dec = ".",
+            row.names = FALSE, col.names = TRUE)
+```
+
+
+
+
+

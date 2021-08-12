@@ -1,0 +1,251 @@
+---
+title: "2021-07-26_ArchR-comparison"
+author: "Jane Kim"
+date: "7/26/2021"
+output: html_document
+---
+
+```{r}
+library(ArchR)
+```
+
+
+```{r}
+addArchRThreads(threads = 4)
+addArchRGenome("hg38")
+```
+Follow the instructions here: https://greenleaflab.github.io/ArchR_2020/Ex-Analyze-Multiome.html
+
+Set Working Directory to: ~/Desktop/HARVARD/Dana_Farber_Research/comparison
+Inside the working directory create a directory named pbmc_10k
+In the directory pbmc_10k download the following three files:
+```{bash}
+wget https://cf.10xgenomics.com/samples/cell-arc/1.0.0/pbmc_granulocyte_sorted_10k/pbmc_granulocyte_sorted_10k_atac_fragments.tsv.gz
+wget https://cf.10xgenomics.com/samples/cell-arc/1.0.0/pbmc_granulocyte_sorted_10k/pbmc_granulocyte_sorted_10k_atac_fragments.tsv.gz.tbi
+wget https://cf.10xgenomics.com/samples/cell-arc/1.0.0/pbmc_granulocyte_sorted_10k/pbmc_granulocyte_sorted_10k_filtered_feature_bc_matrix.h5
+
+```
+
+
+Get input file
+```{r}
+#Get Input Fragment Files
+inputFiles <- getInputFiles(paths = "/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/comparison/pbmc_10k")[1]
+names(inputFiles) <- "PBMC_10k"
+```
+
+```{r}
+ArrowFiles <- createArrowFiles(
+  inputFiles = inputFiles,
+  sampleNames = names(inputFiles),
+  filterTSS = 10, #Dont set this too high because you can always increase later
+  filterFrags = 10^3.5, 
+  addTileMat = TRUE,
+  addGeneScoreMat = TRUE
+)
+```
+```{r}
+proj <- ArchRProject(
+  ArrowFiles = ArrowFiles, 
+  outputDirectory = "benchmark",
+  copyArrows = TRUE #This is recommened so that if you modify the Arrow files you have an original copy for later usage.
+)
+```
+```{r}
+seRNA <- import10xFeatureMatrix(
+    input = c("/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/comparison/pbmc_10k/filtered_feature_bc_matrix.h5"),
+    names = c("PBMC_10k")
+)
+```
+```{r}
+seRNA
+```
+```{r}
+proj <- addGeneExpressionMatrix(input = proj, seRNA = seRNA, force = TRUE)
+```
+```{r}
+projfilter1 <- proj[proj$TSSEnrichment > 6 & proj$nFrags > 2500 & !is.na(proj$Gex_nUMI)]
+```
+
+```{r}
+projfilter1 <- addIterativeLSI(
+    ArchRProj = projfilter1, 
+    clusterParams = list(
+      resolution = 0.2, # change this to 0.6 
+      sampleCells = 10000,
+      n.start = 10
+    ),
+    saveIterations = FALSE,
+    useMatrix = "TileMatrix", 
+    depthCol = "nFrags",
+    name = "LSI_ATAC"
+)
+```
+
+```{r}
+projfilter1 <- addIterativeLSI(
+    ArchRProj = projfilter1, 
+    clusterParams = list(
+      resolution = 0.2, 
+      sampleCells = 10000,
+      n.start = 10
+    ),
+    saveIterations = FALSE,
+    useMatrix = "GeneExpressionMatrix", 
+    depthCol = "Gex_nUMI",
+    varFeatures = 2500,
+    firstSelection = "variable",
+    binarize = FALSE,
+    name = "LSI_RNA"
+)
+```
+```{r}
+projfilter1 <- addCombinedDims(projfilter1, reducedDims = c("LSI_ATAC", "LSI_RNA"), name =  "LSI_Combined")
+```
+
+Run UMAPs
+```{r}
+projfilter1 <- addUMAP(projfilter1, reducedDims = "LSI_ATAC", name = "UMAP_ATAC", minDist = 0.8, force = TRUE) #default n.neighbors = 40
+projfilter1 <- addUMAP(projfilter1, reducedDims = "LSI_RNA", name = "UMAP_RNA", minDist = 0.8, force = TRUE)
+projfilter1 <- addUMAP(projfilter1, reducedDims = "LSI_Combined", name = "UMAP_Combined", minDist = 0.8, force = TRUE)
+```
+Add clusters
+```{r}
+projfilter1 <- addClusters(projfilter1, reducedDims = "LSI_Combined", name = "Clusters", resolution = 0.4, force = TRUE)
+```
+Plot Embeddings
+```{r}
+p1 <- plotEmbedding(projfilter1, name = "Clusters", embedding = "UMAP_ATAC", size = 1.5, labelAsFactors=F, labelMeans=F)
+p2 <- plotEmbedding(projfilter1, name = "Clusters", embedding = "UMAP_RNA", size = 1.5, labelAsFactors=F, labelMeans=F)
+p3 <- plotEmbedding(projfilter1, name = "Clusters", embedding = "UMAP_Combined", size = 1.5, labelAsFactors=F, labelMeans=F)
+```
+
+```{r}
+p1+p2+p3
+```
+```{r}
+p1
+```
+```{r}
+p2
+```
+```{r}
+p3
+```
+Add 2 more clusters: using reducedDims = "LSI_ATAC" and "LSI_RNA"
+```{r}
+projfilter1 <- addClusters(projfilter1, reducedDims = "LSI_ATAC", name = "Clusters_ATAC", resolution = 0.4, force = TRUE)
+projfilter1 <- addClusters(projfilter1, reducedDims = "LSI_RNA", name = "Clusters_RNA", resolution = 0.4, force = TRUE)
+```
+
+Visualization with Clusters_RNA
+```{r}
+p4 <- plotEmbedding(projfilter1, name = "Clusters_RNA", embedding = "UMAP_ATAC", size = 1.5, labelAsFactors=F, labelMeans=F)
+p5 <- plotEmbedding(projfilter1, name = "Clusters_RNA", embedding = "UMAP_RNA", size = 1.5, labelAsFactors=F, labelMeans=F)
+p6 <- plotEmbedding(projfilter1, name = "Clusters_RNA", embedding = "UMAP_Combined", size = 1.5, labelAsFactors=F, labelMeans=F)
+```
+```{r}
+p4+p5+p6
+```
+Visualization with Clusters_ATAC
+```{r}
+p7 <- plotEmbedding(projfilter1, name = "Clusters_ATAC", embedding = "UMAP_ATAC", size = 1.5, labelAsFactors=F, labelMeans=F)
+p8 <- plotEmbedding(projfilter1, name = "Clusters_ATAC", embedding = "UMAP_RNA", size = 1.5, labelAsFactors=F, labelMeans=F)
+p9 <- plotEmbedding(projfilter1, name = "Clusters_ATAC", embedding = "UMAP_Combined", size = 1.5, labelAsFactors=F, labelMeans=F)
+```
+
+```{r}
+p7+p8+p9
+```
+```{r}
+saveArchRProject(ArchRProj = projfilter1, outputDirectory = "Save-Projfilter1", load = TRUE)
+```
+
+Re-running with resolution = 0.6
+```{r}
+projfilter1 <- addIterativeLSI(
+    ArchRProj = projfilter1, 
+    clusterParams = list(
+      resolution = 0.6, # change this to 0.6 
+      sampleCells = 10000,
+      n.start = 10
+    ),
+    saveIterations = FALSE,
+    useMatrix = "TileMatrix", 
+    depthCol = "nFrags",
+    name = "LSI_ATAC_res0.6"
+)
+```
+
+```{r}
+projfilter1 <- addIterativeLSI(
+    ArchRProj = projfilter1, 
+    clusterParams = list(
+      resolution = 0.6, 
+      sampleCells = 10000,
+      n.start = 10
+    ),
+    saveIterations = FALSE,
+    useMatrix = "GeneExpressionMatrix", 
+    depthCol = "Gex_nUMI",
+    varFeatures = 2500,
+    firstSelection = "variable",
+    binarize = FALSE,
+    name = "LSI_RNA_res0.6"
+)
+```
+
+```{r}
+projfilter1 <- addCombinedDims(projfilter1, reducedDims = c("LSI_ATAC_res0.6", "LSI_RNA_res0.6"), name =  "LSI_Combined_res0.6")
+```
+
+Run UMAPs
+```{r}
+projfilter1 <- addUMAP(projfilter1, reducedDims = "LSI_ATAC_res0.6", name = "UMAP_ATAC_res0.6", minDist = 0.8, force = TRUE)
+projfilter1 <- addUMAP(projfilter1, reducedDims = "LSI_RNA_res0.6", name = "UMAP_RNA_res0.6", minDist = 0.8, force = TRUE)
+projfilter1 <- addUMAP(projfilter1, reducedDims = "LSI_Combined_res0.6", name = "UMAP_Combined_res.0.6", minDist = 0.8, force = TRUE)
+```
+
+```{r}
+projfilter1 <- addClusters(projfilter1, reducedDims = "LSI_Combined_res0.6", name = "Clusters_res0.6", resolution = 0.6, force = TRUE)
+```
+
+```{r}
+p10 <- plotEmbedding(projfilter1, name = "Clusters_res0.6", embedding = "UMAP_ATAC_res0.6", size = 1.5, labelAsFactors=F, labelMeans=F)
+p11 <- plotEmbedding(projfilter1, name = "Clusters_res0.6", embedding = "UMAP_RNA_res0.6", size = 1.5, labelAsFactors=F, labelMeans=F)
+p12 <- plotEmbedding(projfilter1, name = "Clusters_res0.6", embedding = "UMAP_Combined_res.0.6", size = 1.5, labelAsFactors=F, labelMeans=F)
+```
+```{r}
+p10+p11+p12
+```
+
+```{r}
+saveArchRProject(ArchRProj = projfilter1, outputDirectory = "Save-Projfilter2", load = TRUE)
+```
+
+```{r}
+projfilter1 <- addClusters(projfilter1, reducedDims = "LSI_ATAC_res0.6", name = "Clusters_binmethod_res0.6", resolution = 0.6, force = TRUE)
+```
+
+```{r}
+p13 <- plotEmbedding(projfilter1, name = "Clusters_binmethod_res0.6", embedding = "UMAP_ATAC_res0.6", size = 1.5, labelAsFactors=F, labelMeans=F)
+p14 <- plotEmbedding(projfilter1, name = "Clusters_binmethod_res0.6", embedding = "UMAP_RNA_res0.6", size = 1.5, labelAsFactors=F, labelMeans=F)
+p15 <- plotEmbedding(projfilter1, name = "Clusters_binmethod_res0.6", embedding = "UMAP_Combined_res.0.6", size = 1.5, labelAsFactors=F, labelMeans=F)
+```
+```{r}
+p13
+```
+```{r}
+projfilter1 <- addClusters(projfilter1, reducedDims = "LSI_Combined", name = "test", resolution = 0.6, force = TRUE)
+```
+```{r}
+projfilter1 <- addClusters(projfilter1, reducedDims = "LSI_ATAC_res0.6", name = "Clusters_bin_method_0.6", resolution = 0.6, force = TRUE)
+```
+
+```{r}
+tileMatrixtest <- getMatrixFromProject(
+  ArchRProj = projfilter1,
+  useMatrix = "TileMatrix",
+  binarize = TRUE)
+```
+

@@ -1,0 +1,14 @@
+---
+title: "2021-07-04_snakemake-maestro-resources"
+author: "Jane Kim"
+date: "7/9/2021"
+output: html_document
+---
+
+- Results: Downloading html report files from remote to local
+```{bash}
+scp janekim@kraken.dfci.harvard.edu:/liulab/janekim/maestro_practice/multi-scatac-chromap/Result/Report/\{SRR11614703_scATAC_report.html,SRR11614706_scATAC_report.html,SRR11614704_scATAC_report.html,SRR11614707_scATAC_report.html,SRR11614705_scATAC_report.html,SRR11614708_scATAC_report.html\} /Users/jeongeunkim/Downloads
+```
+
+- key points
+1) Column: Cell, Row: Genes

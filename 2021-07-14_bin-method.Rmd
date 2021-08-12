@@ -1,0 +1,71 @@
+---
+title: "2021-07-14_bin-method"
+author: "Jane Kim"
+date: "7/14/2021"
+output: html_document
+---
+
+For Macbook Big Sur: Download gfortran-Intel-11.1-BigSur.dmg, XQuartz
+
+https://github.com/fxcoudert/gfortran-for-macOS/releases
+https://www.archrproject.com
+
+
+Install devtools if not installed
+```{r}
+if (!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
+```
+
+Install BioCManager if not installed
+```{r eval = False}
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+```
+
+```{r}
+library(devtools)
+library(BiocManager)
+```
+
+NEED TO HAVE THE R VERSION 
+R-4.1.0.pkg not the R-4.1.0-arm64.pkg 
+```{bash}
+brew install wget # use brew to install wget
+```
+
+```{bash}
+### if you get this error: xcrun: error: invalid active developer path (/Library/Developer/CommandLineTools), missing xcrun at: /Library/Developer/CommandLineTools/usr/bin/xcrun
+
+xcode-select --install
+```
+
+Install GSL
+```{bash}
+wget http://gnu.mirror.constant.com/gsl/gsl-2.6.tar.gz
+tar -xzvf gsl-2.6.tar.gz
+cd gsl-2.6
+./configure
+make
+sudo make install
+```
+
+```{r}
+Sys.setenv(CONDA_BUILD_SYSROOT="/")
+ld_path <- paste(Sys.getenv("LD_LIBRARY_PATH"), "/usr/local/lib/", sep = ";")
+Sys.setenv(LD_LIBRARY_PATH = ld_path)
+#devtools::install_github("r-lib/remotes")
+#options(buildtools.check = function(action) TRUE )
+devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())
+
+```
+
+Load ArchR and download all dependencies not installed by default
+```{r}
+library(ArchR)
+ArchR::installExtraPackages()
+```
+
+ArchR
+
+1. input: aligned BAM or fragment file
+2. Quality Control: ArchR computes transcription start site (TSS) enrichment scores, not the fraction of reads in promoters.
+3. 

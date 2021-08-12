@@ -1,0 +1,37 @@
+---
+title: "2021-07-22_MAESTRO-with-ArchR-data"
+author: "Jane Kim"
+date: "7/22/2021"
+output: html_document
+---
+
+```{bash}
+ssh janekim@kraken.dfci.harvard.edu
+```
+
+- always start a new job to get on the interactive node
+```{bash, eval = FALSE}
+srun -t 1600 --mem=60G -c 4 --pty bash
+```
+
+- loading MAESTRO
+```{bash}
+source /liulab/galib/mini2/bin/activate MAESTRO_1.5.0.1
+```
+
+```{bash}
+MAESTRO scatac-init --batch --bulk_peaks --downsample \
+--target_reads 5000000 --input_path /liulab/janekim/maestro_with_archr_data \
+--gzip --platform 10x-genomics --format fastq --species GRCh38 \
+--deduplication cell-level --mapping chromap \
+--giggleannotation /liulab/galib/sc_CIDC/annotations/giggle.all/ \
+--fasta /liulab/galib/sc_CIDC/references/Refdata_scATAC_MAESTRO_GRCh38_1.1.0/GRCh38_genome.fa \
+--index /liulab/galib/sc_CIDC/references/chromap/GRCh38_chromap.index \
+--whitelist /liulab/galib/sc_CIDC/references/whitelist/737K-cratac-v1.txt \
+--cores 16 --directory multi-scatac-chromap \
+--annotation --method RP-based --signature human.immune.CIBERSORT \
+--clusterpeak --shortpeak \
+--rpmodel Enhanced \
+--peak_cutoff 100 --count_cutoff 1000 --frip_cutoff 0.2 --cell_cutoff 500
+```
+

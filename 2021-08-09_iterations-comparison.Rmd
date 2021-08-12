@@ -1,0 +1,39 @@
+---
+title: "2021-08-09_iterations-comparison"
+author: "Jane Kim"
+date: "8/9/2021"
+output: html_document
+---
+
+```{r}
+archr_proj <- loadArchRProject("/Users/jeongeunkim/Desktop/HARVARD/Dana_Farber_Research/Save-projfilter2")
+```
+
+```{r}
+archr_proj <- addIterativeLSI(
+    ArchRProj = archr_proj, 
+    clusterParams = list(
+      resolution = 0.6, # change this to 0.6 
+      sampleCells = 10000,
+      n.start = 10
+    ),
+    iterations = 1,
+    saveIterations = TRUE,
+    useMatrix = "TileMatrix", 
+    depthCol = "nFrags",
+    name = "LSI_ATAC_iter1"
+)
+```
+
+```{r}
+archr_proj  <- addUMAP(archr_proj, reducedDims = "LSI_ATAC_iter1", name = "UMAP_ATAC_iter1", minDist = 0.8, force = TRUE)
+```
+```{r}
+archr_proj  <- addClusters(archr_proj, reducedDims = "LSI_ATAC_iter1", name = "Clusters_ATAC_iter1", resolution = 0.6, force = TRUE)
+```
+
+```{r}
+umap_iter1 <- plotEmbedding(archr_proj, name = "Clusters_ATAC_iter1", embedding = "UMAP_ATAC_iter1", size = 1.5, labelAsFactors=F, labelMeans=F)
+umap_iter1
+```
+
