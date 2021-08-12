@@ -16,6 +16,9 @@ ArchR Function Descriptions: https://www.archrproject.com/reference/index.html
 
 ArchR Multiome PBMC 10X data analysis: https://greenleaflab.github.io/ArchR_2020/Ex-Analyze-Multiome.html
 
+## Link to Download the scATAC-seq data
+https://support.10xgenomics.com/single-cell-multiome-atac-gex/datasets/1.0.0/pbmc_granulocyte_sorted_10k
+
 ## Tutorial for MAESTRO
 https://baigal628.github.io/MAESTRO_documentation/multi-scatac.html
 
